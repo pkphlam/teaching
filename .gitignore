@@ -1,0 +1,12 @@
+# Ignore all PyCharm .idea files
+.idea/
+
+# Ignore all ancillary files
+*.log
+*.aux
+*.nav
+*.out
+*.toc
+*.snm
+*.tex~
+*.vrb
