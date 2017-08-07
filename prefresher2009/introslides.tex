@@ -1,0 +1,268 @@
+\documentclass[]{beamer}
+
+\usepackage{amsfonts}
+\usepackage{fancybox}%,times}
+\usepackage{graphicx,psfrag,epsf}
+\usepackage{epsfig}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{enumerate}
+
+
+\newcommand{\ol}{\overline}
+\newcommand{\ul}{\underline}
+\newcommand{\vb}{\verbatim}
+\newcommand{\bi}{\begin{itemize}}
+\newcommand{\ei}{\end{itemize}}
+\newcommand{\be}{\begin{enumerate}}
+\newcommand{\ee}{\end{enumerate}}
+\newcommand{\noi}{\noindent}
+\newcommand{\ro}{{\bf R}^1 }
+\newcommand{\rn}{{\bf R}^n }
+\newcommand{\pbt}{\parbox{2in}}
+\newcommand{\lra}{\Longrightarrow}
+\newcommand{\qlq}{\quad\lra\quad}
+\newcommand{\bul}{\bullet}
+\newcommand{\eps}{\epsilon}
+\newcommand{\xc}{_{x\to c}}
+\newcommand{\nin}{_{n\to\infty}}
+\newcommand{\llim}{\lim\limits}
+\newcommand{\pb}{\parbox{1in}}
+
+\newcommand{\red}{\color{red}}
+\newcommand{\black}{\color{black}}
+
+\title{Math (P)refresher 2009}
+\author{Instructor: Patrick Lam\\ TF: Viridiana Rios}
+\date{August 24 - September 1, 2009}
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+
+\begin{frame}
+\begin{center}
+Introduction
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{us}
+\pause
+\begin{itemize}
+\item \textbf{instructor}: Patrick Lam ({\tt plam@fas.harvard.edu}) 
+\pause
+\item \textbf{tf}: Viridiana Rios ({\tt vrios@fas.harvard.edu})
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{you}
+\begin{itemize}
+\pause 
+\item name
+\item subfield (research interests)
+\item where you're from
+\item what do you like to do in your spare time?
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{schedule}
+\begin{itemize}
+\item lecture in the morning, computing and problem set sessions in the afternoon (generally)
+\pause
+\item everyday except sunday
+\pause
+\item GSAS orientation wednesday
+\pause
+\item lunch with random gov grad students on saturday
+\pause
+\item except for today, the lunches will be limited to gov grad students
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{textbook}
+\pause
+\begin{itemize}
+\item Essential Mathematics for Political and Social Research by Jeff Gill (second printing onward)
+\pause
+\item \$35 (cash or check out to Harvard University) 
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{computing}
+\pause
+\begin{itemize}
+\item fas account
+\pause
+\item novell account
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{why math?}
+\pause
+Almost any political science question can be answered with
+\pause
+\bigskip
+\begin{itemize}
+\item statistical data analysis
+\pause
+\item formal theory
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{statistical analysis}
+\pause
+theory: x causes y \\
+\pause
+\bigskip
+evidence: lots of data\\
+\pause
+\bigskip
+\textbf{q}: how do you process lots of data? \\
+\pause
+\bigskip
+\textbf{a}: use math and statistical analysis
+\end{frame}
+
+\begin{frame}
+\frametitle{formal theory}
+\pause
+observation: x and y occur together \\
+\pause
+\bigskip
+\textbf{q}: how to explain this observation in a logical and internally consistent manner? \\
+\pause
+\bigskip
+\textbf{a}: build a formal mathematical model
+\end{frame}
+
+\begin{frame}
+\frametitle{tips}
+\pause
+\begin{itemize}
+\item information overload
+\pause
+\item focus on \red concepts \black 
+\pause
+\item math is cumulative
+\pause
+\item you are the smartest person in the room
+\pause
+\item attitude is half the battle
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\begin{center}
+Computing
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{three things}
+\pause
+\begin{itemize}
+\item VNC server (unix OS)
+\item R
+\item \LaTeX
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{vnc server}
+\pause
+\begin{itemize}
+\item virtual network computing
+\pause
+\item unix
+\pause
+\item link to FAS
+\pause
+\item benefits
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{R}
+\pause
+\begin{itemize}
+\item statistical analysis
+\pause
+\item open-source 
+\pause
+\item based on S programming language
+\pause
+\item (potentially) limitless capabilities
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{\LaTeX}
+\pause
+\begin{itemize}
+\item document preparation
+\pause
+\item TeX and donald knuth
+\pause
+\item no need to worry about formatting
+\pause
+\item typing math is easy
+\pause
+\item never use MS Office again
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{installing \LaTeX}
+\pause
+\begin{enumerate}
+\item TeX distribution
+\pause
+\begin{itemize}
+\item MiKTeX for Windows: \url{http://miktex.org/}
+\item MacTeX for Mac: \url{http://www.tug.org/mactex/}
+\end{itemize}
+\pause
+\bigskip
+\item \LaTeX\hspace{1pt} editor
+\pause
+\begin{itemize}
+\item Texmaker: \url{http://www.xm1math.net/texmaker/}
+\item WinEDT, Xemacs, LyX, etc.
+\end{itemize}
+\end{enumerate}
+\end{frame}
+
+\begin{frame}
+\frametitle{R}
+\pause
+\begin{center}
+CRAN: \url{http://cran.r-project.org/}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{vnc server}
+\pause
+\begin{itemize}
+\item Windows: HMDC script (\url{http://www.hmdc.harvard.edu/HMDC_VNC.EXE})
+\pause
+\bigskip
+\item Mac: Chicken of the VNC (\url{http://sourceforge.net/projects/cotvnc/})
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\begin{center}
+getting onto the VNC server, after lunch\\
+ \pause (or see slides on prefresher website under VNC)
+\end{center}
+\end{frame}
+\end{document}

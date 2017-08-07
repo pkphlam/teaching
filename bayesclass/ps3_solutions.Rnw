@@ -1,0 +1,212 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[latin1]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{fullpage}
+\usepackage{color}
+\usepackage{Sweave}
+\author{Patrick Lam}
+
+\parindent=0in
+\newcommand{\red}{\color{red}}
+\newcommand{\black}{\color{black}}
+\begin{document}
+
+\begin{center}
+\begin{Large}Week 3 Problems\end{Large}
+\end{center}
+\bigskip
+\begin{enumerate}
+
+\item (Adapted from Jackman 2.3) Three polls are fielded on the weekend prior to an election, each using simple random sampling, producing the following estimates of vote intention for the incumbent candidate.
+\medskip
+
+\begin{center}
+\begin{tabular}{lcc}
+\hline
+Poll & Support (\%) & Sample size \\
+\hline
+A & 52 & 350 \\
+B & 49 & 500 \\
+C & 55 & 600 \\
+\hline
+\end{tabular}
+\end{center}
+\medskip
+\begin{itemize}
+\item[a)] Let the proportion of the electorate intending to vote for the incumbent be $\theta$.  Write out a plausible statistical model for each poll's results in which $\theta$ appears as a parameter.  Specifically, specify a likelihood and prior for your model. \\
+
+\medskip \red
+Let $Y$ denote the number of supporters for the incumbent in a poll.  Then we have the following likelihood and prior.
+\begin{eqnarray*}
+Y &\sim& \mathrm{Binomial}(n, \theta) \\
+\theta &\sim& \mathrm{Beta}(a,b)
+\end{eqnarray*}
+where $n$ is the sample size for each poll. \\
+\medskip \black 
+
+\item[b)] Suppose your have no prior information over $\theta$.  Taking each poll separately, what is the posterior density for $\theta$ given the information in each poll.  Find posterior means, standard deviations, and credible intervals using R. \\
+
+\medskip \red
+With a binomial likelihood and beta prior, the posterior is a conjugate Beta($y+a$, $n-y+b$) posterior.  For an uninformative prior, $a=1$ and $b=1$. \\
+\medskip
+\small
+<<>>=
+Y <- c(350*.52, 500*.49, 600*.55)
+n <- c(350, 500, 600)
+a <- b <- 1
+n.sims <- 10000
+draws <- matrix(NA, nrow=n.sims, ncol=3)
+colnames(draws) <- c("A","B","C")
+for(i in 1:3){
+  draws[,i] <- rbeta(n.sims, Y[i]+a, n[i] - Y[i] + b)
+}
+colMeans(draws)
+apply(draws, MARGIN=2, FUN=sd)
+apply(draws, MARGIN=2, FUN=quantile, probs=c(.025,.975))
+@
+\normalsize \medskip \black 
+
+\item[c)] Now suppose you observe each poll in order sequentially starting with A.  Update your posterior with each new poll and show how your estimates change.\\
+
+\medskip \red \small
+<<>>=
+Y <- c(350*.52, 500*.49, 600*.55)
+n <- c(350, 500, 600)
+a <- b <- 1
+n.sims <- 10000
+draws <- matrix(NA, nrow=n.sims, ncol=3)
+colnames(draws) <- c("A","B","C")
+for(i in 1:3){
+  draws <- rbeta(n.sims, sum(Y[1:i])+a, sum(n[1:i])-sum(Y[1:i])+b)
+  print(c(mean=mean(draws), sd=sd(draws), quantile(draws, probs=c(.025,.975))))
+}
+@
+\medskip
+\normalsize As we get more information, the posterior standard deviation decreases and the posterior mean gets closer to 0.5, which is where the bulk of the observations are around.\\
+\medskip \black 
+
+\item[d)] Now suppose you observe all the polls simultaneously such that you can pool the results together.  Analytically show that your posterior is equivalent to the posterior from c). \\
+
+\medskip \red
+In part c), we updated our estimates by using old posteriors as new priors.  So our posteriors at each update were
+\begin{eqnarray*}
+\theta | y_A &\sim& \mathrm{Beta}(y_A + a, n_A - y_A + b) \\
+\theta | y_A, y_B &\sim& \mathrm{Beta}(y_B + (y_A + a), n_B - y_B + (n_A - y_A + b)) \\
+\theta | y_A, y_B, y_C &\sim& \mathrm{Beta}(y_C + (y_B + y_A + a), n_C - y_C + (n_B - y_B + n_A - y_A + b)) \\
+&\sim& \mathrm{Beta}(y_{ABC} + a, n_{ABC} - y_{ABC} + b)
+\end{eqnarray*}
+which is mathematically equivalent to the posterior in the case of the polls pooled together. \\
+\medskip \black
+
+\item[e)] Suppose the electorate is composed of 3,000 voters who must all cast a vote.  Using simulation and your posterior from d), predict the probability that the incumbent will win the election given majority rule. \\
+
+\medskip \red \small
+<<>>=
+y <- sum(c(350*.52, 500*.49, 600*.55))
+n <- sum(c(350, 500, 600))
+a <- b <- 1
+n.sims <- 10000
+post.draws <- rbeta(n.sims, y+a, n-y+b)
+post.votes.dist <- sapply(post.draws, FUN=rbinom, n=1, size=3000)
+mean(post.votes.dist > 3000*.5)
+@
+\normalsize \medskip \black
+
+\item[f)] Now suppose that the electoral rule dictates that a candidate can only win with a supermajority (55\%).  What is the probability that the incumbent will win the election given this new rule? \\
+
+\medskip \red \small
+<<>>=
+mean(post.votes.dist > 3000*.55)
+@
+\normalsize \medskip \black
+\end{itemize}
+
+\bigskip
+
+\item A prior is considered flat or uninformative if it is proportional to a constant.
+\begin{eqnarray*}
+p(\theta) \propto c
+\end{eqnarray*}
+For a model with a Binomial($n$, $\theta$) likelihood,
+\begin{itemize}
+\item[a)] show that a Beta(1,1) prior on $\theta$ is uninformative. \\
+
+\medskip \red
+The PDF of a Beta(1,1) prior on $\theta$ is
+\begin{eqnarray*}
+p(\theta) &=& \frac{\Gamma(1+1)}{\Gamma(1) \Gamma(1)} \theta^{1-1} (1-\theta)^{1-1} \\
+&=& 1
+\end{eqnarray*}
+\medskip \black
+
+\item[b)] show that if we transform the parameter such that we have a new parameter $\Theta = \exp(\theta)$, a Beta(1,1) prior on $\theta$ is no longer uninformative on $\Theta$. \\ 
+
+\medskip \red
+Let $\Theta = \exp(\theta)$.  To find the prior distribution of $\Theta$ given a Beta(1,1) prior on $\theta$, we need to use the change of variables formula.
+\begin{eqnarray*}
+\theta &=& \log \Theta \\
+\frac{d}{d\Theta} \log \Theta &=& \frac{1}{\Theta} \\\\
+p(\theta) &=& 1\\
+p(\Theta) &=& 1 \left \vert \frac{1}{\Theta} \right \vert \\
+&=& \frac{1}{\Theta} 
+\end{eqnarray*}
+We can see that the prior distribution of $\Theta$ under a Beta(1,1) prior on $\theta$ depends on $\Theta$ and so is not uninformative. 
+\black \medskip
+
+\end{itemize}
+
+\bigskip
+
+\item (From Jackman Example 2.9) Geddes (1990) examined the relationship between foreign threat and social revolution in Latin America using data that generated the following 2-by-2 table.
+
+\medskip
+\begin{center}
+\begin{tabular}{lcc}
+\hline 
+& Revolution & No revolution \\
+\hline
+Defeated and invaded or lost territory & 1 & 7 \\
+Not defeated for 20 years & 2 & 74 \\
+\hline
+\end{tabular}
+\end{center}
+\medskip
+
+Each observation is a 20-year period for each Latin American country, with any given country contributing multiple observations.  Propose a model to assess the hypothesis that suffering a military loss within a 20-year period increases the chances of revolution within a country.  What is the probability that military defeat is positively associated with revolution? \\
+
+\medskip \red
+We can model the problem as two separate binomial distributions.  Let $\theta_0$ denote the probability of revolution conditional on no military defeats and $\theta_1$ denote the probability of revolution given a military defeat.  We are interested in the following quantity: $P(\theta_1 > \theta_0)$ \\
+
+If we assume that $\theta_1$ and $\theta_0$ are independent a priori and using an uninformative Beta prior, we have the following model:
+\begin{eqnarray*}
+Y_0 &\sim& \mathrm{Binomial}(76, \theta_0) \\
+Y_1 &\sim& \mathrm{Binomial}(8, \theta_1)\\
+\theta_0 &\sim& \mathrm{Beta}(1,1) \\
+\theta_1 &\sim& \mathrm{Beta}(1,1)
+\end{eqnarray*} 
+Our posteriors are then
+\begin{eqnarray*}
+\theta_0 | Y_0 &\sim& \mathrm{Beta}(3,75)\\
+\theta_1 | y_1 &\sim& \mathrm{Beta}(2,8)
+\end{eqnarray*}
+The probability that military defeat is positively associated with revolution is $P(\theta_1 > \theta_0)$, a quantity which we can find via simulation of the posteriors. \\
+\medskip
+\small
+<<>>=
+n.sims <- 10000
+theta0.post <- rbeta(n.sims, 3,75)
+theta1.post <- rbeta(n.sims, 2,8)
+mean(theta1.post > theta0.post)
+@
+\black
+
+\end{enumerate}
+
+\end{document}
+
+
+
+
+

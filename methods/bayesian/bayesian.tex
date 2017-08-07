@@ -1,0 +1,108 @@
+\documentclass{beamer}
+
+\usetheme{default}
+\usepackage{subfigure}
+\usepackage{Sweave}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{multicol}
+\usepackage{bm}
+
+
+\author{Patrick Lam}
+\title{Introduction to Bayesian Statistics}
+\date{}
+%\date{September 22, 2008}
+
+\begin{document}
+
+\frame{\titlepage}
+
+
+\section{Introduction to Bayesian Statistics}
+
+\begin{frame}
+\frametitle{Bayesian versus Non-Bayesian}
+
+\pause
+Non-Bayesian Approach:
+\pause
+\begin{itemize}
+\item Parameters are fixed at their true but unknown value
+\pause
+\item Objective notion of probability based on repeated sampling
+\pause
+\item Large sample properties/asymptotic approximations
+\pause
+\item Maximizing a likelihood
+\end{itemize}
+\pause
+\bigskip
+Bayesian Approach
+\pause
+\begin{itemize}
+\item Parameters are random variables with distributions attached to them
+\pause
+\item Subjective notion of probability (prior) combined with data
+\pause
+\item Does not require large sample approximations
+\pause
+\item Simulation-based approach
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{The Basics of Bayesian Statistics}
+\pause
+Based on Bayes' Rule:
+\begin{eqnarray*}
+p(\theta | y) = \dfrac{\textcolor{red}{p(y | \theta)} \textcolor{blue}{p(\theta)}}{\textcolor{brown}{p(y)}}
+\end{eqnarray*}
+where $\theta$ are our parameters and $y$ is our data. \\
+\pause
+\bigskip
+We have a posterior density, \pause\textcolor{red}{sampling density (or
+likelihood)}, \pause \textcolor{blue}{prior density}, \pause and a
+\textcolor{brown}{normalizing constant} (which we typically do not need to find).
+\end{frame}
+
+\begin{frame}
+\frametitle{Why Bayesian?}
+\pause
+\begin{itemize}
+\item Ability to incorporate prior knowledge (perhaps qualitative knowledge)
+\pause
+\item Results approximate MLE results as $n$ increases
+\pause
+\item Confidence intervals have a more intuitive meaning (we call them
+credible sets)
+\pause
+\item Ability to find more quantities of interest (for example,
+$P(\theta > .3)$ or $P$(Obama is more left than Kerry) in ideal point estimation)
+\pause 
+\item Easily set up and estimate difficult models
+\pause
+\item Priors often help with identification
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Why Not Bayesian?}
+\pause
+\begin{itemize}
+\item It's hard
+\pause
+\item Computationally intensive
+\pause
+\item Need defense of priors or sensitivity analyses of prior specification
+\pause
+\item No guarantee of Markov Chain convergence
+\end{itemize}
+\pause
+\bigskip
+Something to think about:\\
+\bigskip
+Is MLE/frequentist approach simply Bayesian statistics with an uninformative prior?
+\end{frame}
+
+\end{document}

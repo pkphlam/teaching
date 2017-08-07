@@ -1,0 +1,43 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[latin1]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{fullpage}
+\usepackage{color}
+
+\author{Patrick Lam}
+
+\parindent=0in
+\newcommand{\red}{\color{red}}
+\newcommand{\black}{\color{black}}
+\begin{document}
+
+\begin{center}
+\begin{Large}Week 5 Problems\end{Large}
+\end{center}
+\bigskip
+\begin{enumerate}
+
+\item Load the {\tt turnout} dataset from the {\tt Zelig} library.  Implement a Bayesian logistic regression of {\tt vote} on {\tt age} and {\tt income} using a random walk Metropolis-Hasting algorithm with a diffuse multivariate Normal prior.  Visually check for convergence.
+
+\begin{itemize}
+\item First, use a multivariate Normal jumping distribution to draw all the parameters at the same time.  Keep track of your acceptance rate.  Note any problems that you encountered.
+\item Next, draw each $\beta$ separately with a univariate Normal jumping distribution given your draws of the other $\beta$s.  That is, draw in the following order:
+\begin{enumerate}
+\item[1.] $\beta_0^{(t)} | \beta_1^{(t-1)}, \beta_2^{(t-1)}$
+\item[2.] $\beta_1^{(t)} | \beta_0^{(t)}, \beta_2^{(t-1)}$
+\item[3.] $\beta_2^{(t)} | \beta_0^{(t)}, \beta_1^{(t)}$
+\end{enumerate}
+You may tune your individual jumping distributions differently (by setting different variances) to better control acceptance rates.
+\end{itemize}
+
+Compare your results to the MLE.  You may also check your results using {\tt MCMClogit()} in {\tt MCMCpack}.    
+\end{enumerate}
+
+\end{document}
+
+
+
+
+

@@ -1,0 +1,1091 @@
+\documentclass[handout]{beamer}
+
+
+\usetheme{default}
+\usepackage{subfigure}
+\usepackage{amsmath}
+\usepackage{Sweave}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{multicol}
+\usepackage[all]{xy}
+\usepackage{bm}
+
+
+\author{Patrick Lam}
+\title{MCMC Methods: Gibbs Sampling and the Metropolis-Hastings Algorithm}
+\date{}
+%\date{October 27, 2008}
+
+\begin{document}
+
+\newcommand{\red}{\textcolor{red}}
+\newcommand{\blue}{\textcolor{blue}}
+\newcommand{\purple}{\textcolor{purple}}
+
+\frame{\titlepage}
+
+\begin{frame}
+\frametitle{Outline}
+\tableofcontents
+\end{frame}
+
+\section{Introduction to Markov Chain Monte Carlo}
+
+\begin{frame}
+\frametitle{Outline}
+\tableofcontents[currentsection]
+\end{frame}
+
+\begin{frame}
+\frametitle{What is Markov Chain Monte Carlo (MCMC)?}
+\pause
+\textbf{Markov Chain}: a \textit{stochastic process} in which future states are
+independent of past states given the present state\\
+\bigskip
+\pause
+\textbf{Monte Carlo}: simulation\\
+\bigskip
+\pause
+Up until now, we've done a lot of Monte Carlo simulation to find
+integrals rather than doing it analytically, a process called \textit{Monte
+Carlo Integration}.\\
+\bigskip
+\pause 
+Basically a fancy way of saying we can take
+quantities of interest of a distribution from simulated draws from the
+distribution.
+\end{frame}
+
+\begin{frame}
+\frametitle{Monte Carlo Integration}
+\pause
+Suppose we have a distribution $p(\theta)$ (perhaps a posterior) that
+we want to take quantities of interest from.\\
+\bigskip
+\pause
+To derive it analytically, we need to take integrals:
+\begin{eqnarray*}
+I = \int_{\Theta} g(\theta) p(\theta) d\theta
+\end{eqnarray*}
+where $g(\theta)$ is some function of $\theta$ ($g(\theta) =
+\theta$ for the mean and $g(\theta) = (\theta - E(\theta))^2$ for the
+variance).\\
+\bigskip
+\pause
+We can approximate the integrals via Monte Carlo Integration by simulating
+$M$ values from $p(\theta)$ and calculating
+\begin{eqnarray*}
+\hat{I}_M = \frac{1}{M} \sum_{i=1}^M g(\theta^{(i)})
+\end{eqnarray*}
+\end{frame}
+
+\begin{frame}[fragile]
+For example, we can compute the expected value of the Beta(3,3)
+distribution analytically:
+\pause
+\begin{eqnarray*}
+E(\theta) = \int_{\Theta} \theta p(\theta) d\theta =
+\int_{\Theta} \theta \frac{\Gamma(6)}{\Gamma(3) \Gamma(3)} \theta^{2}
+(1-\theta)^2 d\theta = \frac{1}{2}
+\end{eqnarray*}
+\pause
+or via Monte Carlo methods:
+\pause
+\medskip
+\tiny
+\begin{Schunk}
+\begin{Sinput}
+> M <- 10000
+> beta.sims <- rbeta(M, 3, 3)
+> sum(beta.sims)/M
+\end{Sinput}
+\begin{Soutput}
+[1] 0.5013
+\end{Soutput}
+\end{Schunk}
+\pause
+\normalsize
+Our Monte Carlo approximation $\hat{I}_M$ is a simulation consistent
+estimator of the true value $I$: \pause $\hat{I}_M
+\rightarrow I$ as $M \rightarrow \infty$.\\
+\bigskip
+\pause
+We know this to be true from the Strong Law of Large Numbers.
+\end{frame}
+
+\begin{frame}
+\frametitle{Strong Law of Large Numbers (SLLN)}
+\pause
+Let $X_1, X_2, \dots$ be a sequence of \textbf{independent} and
+identically distributed random variables, each having a finite mean
+$\mu = E(X_i)$.\\
+\bigskip
+Then with probability 1,
+\begin{eqnarray*}
+\frac{X_1 + X_2 + \dots + X_M}{M} \rightarrow \mu \; \mathrm{as} \; M
+\rightarrow \infty\\
+\end{eqnarray*}
+\pause
+In our previous example, each simulation draw was \textbf{independent} and
+distributed from the same Beta(3,3) distribution.\\
+\bigskip
+\pause
+This also works with variances and other quantities of interest, since a
+function of i.i.d.\ random variables are also i.i.d.\ random variables.\\
+\bigskip
+\pause
+But what if we can't generate draws that are \textbf{independent}?
+
+\end{frame}
+
+\begin{frame}
+Suppose we want to draw from our posterior distribution $p(\theta |
+y)$, but we cannot sample independent draws from it.\\
+\bigskip
+\pause
+For example, we often do not know the normalizing constant.\\
+\bigskip
+\pause
+However, we may be able to sample draws from $p(\theta | y)$ that are
+slightly dependent.\\
+\bigskip
+\pause
+If we can sample slightly dependent draws using a \textbf{Markov
+chain}, then we can still find quantities of interests from those draws.
+\end{frame}
+
+\begin{frame}
+\frametitle{What is a Markov Chain?}
+\pause
+Definition: a \textit{stochastic process} in which future states are
+independent of past states given the present state\\
+\bigskip
+\pause
+Stochastic process: a \textit{consecutive} set of \textit{random} (not
+deterministic) quantities defined on some known state space $\Theta$.
+\pause
+\begin{itemize}
+\item think of $\Theta$ as our parameter space.
+\pause
+\item \textit{consecutive} implies a time component, indexed by $t$.
+\end{itemize}
+\pause
+\bigskip
+Consider a draw of $\bm{\theta}^{(t)}$ to be a state at iteration $t$.  The next
+draw $\bm{\theta}^{(t+1)}$ is dependent only on the current draw
+$\bm{\theta}^{(t)}$, and not on any past draws.\\
+\pause 
+\bigskip
+This satisfies the \textbf{Markov property}:
+\pause
+\begin{eqnarray*}
+p(\bm{\theta}^{(t+1)} | \bm{\theta}^{(1)}, \bm{\theta}^{(2)}, \dots,
+\bm{\theta}^{(t)}) = p(\bm{\theta}^{(t+1)} | \bm{\theta}^{(t)})
+\end{eqnarray*}
+\end{frame}
+
+\begin{frame}
+So our Markov chain is a bunch of draws of $\bm{\theta}$ that are each
+slightly dependent on the previous one.  \pause The chain wanders
+around the parameter space, remembering only where it has been in the
+last period.\\
+\pause
+\bigskip
+What are the rules governing how the chain jumps from one state to
+another at each period?\\
+\pause
+\bigskip
+The jumping rules are governed by a \textbf{transition kernel}, which
+is a mechanism that describes the probability of moving to some other
+state based on the current state. 
+\end{frame}
+
+\begin{frame}
+\frametitle{Transition Kernel}
+\pause
+For discrete state space ($k$ possible states): \pause a $k \times k$ matrix of transition probabilities.\\
+\bigskip
+\pause
+Example: Suppose $k = 3$.  \pause The $3 \times 3$ transition matrix
+$\bm{P}$ would be
+\begin{table}[!htp]
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+$p(\bm{\theta_A}^{(t+1)} | \bm{\theta_A}^{(t)} )$ & $p(\bm{\theta_B}^{(t+1)} |
+\bm{\theta_A}^{(t)} )$ & $p(\bm{\theta_C}^{(t+1)} |
+\bm{\theta_A}^{(t)} )$ \\
+\hline
+$p(\bm{\theta_A}^{(t+1)} | \bm{\theta_B}^{(t)} )$ & $p(\bm{\theta_B}^{(t+1)} |
+\bm{\theta_B}^{(t)} )$ & $p(\bm{\theta_C}^{(t+1)} |
+\bm{\theta_B}^{(t)} )$ \\
+\hline
+$p(\bm{\theta_A}^{(t+1)} | \bm{\theta_C}^{(t)} )$ & $p(\bm{\theta_B}^{(t+1)} |
+\bm{\theta_C}^{(t)} )$ & $p(\bm{\theta_C}^{(t+1)} |
+\bm{\theta_C}^{(t)} )$ \\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+where the subscripts index the 3 possible values that $\bm{\theta}$
+can take.  \\
+\bigskip
+\pause
+The rows sum to one and define a conditional PMF, conditional on the
+current state.  \pause The columns
+are the marginal probabilities of being in a certain state in the next
+period.\\
+\pause
+\bigskip
+For continuous state space (infinite possible states), the transition
+kernel is a bunch of conditional PDFs: $f(\bm{\theta_j}^{(t+1)} | \bm{\theta_i}^{(t)})$
+\end{frame}
+
+\begin{frame}
+\frametitle{How Does a Markov Chain Work? (Discrete Example)}
+\pause
+\begin{enumerate}
+\item Define a starting distribution $\prod^{(0)}$ (a $1 \times k$
+vector of probabilities that sum to one).
+\pause
+\medskip
+\item At iteration 1, our distribution $\prod^{(1)}$ (from which $\bm{\theta}^{(1)}$ is drawn) is
+\begin{center}
+\begin{tabular}{ccccc}
+$\prod^{(1)}$ & = & $\prod^{(0)}$ & $\times$ & $\bm{P}$\\
+$(1 \times k)$ & & $(1 \times k)$ & $\times$ & $(k \times k)$
+\end{tabular}
+\end{center}
+\pause
+\medskip
+\item At iteration 2, our distribution $\prod^{(2)}$ (from which $\bm{\theta}^{(2)}$ is drawn) is
+\begin{center}
+\begin{tabular}{ccccc}
+%$\prod^{(2)}$ & = & $\prod^{(0)}$ & $\times$ & $\bm{P}$ & $\times$ & $\bm{P}$\\
+%$(1 \times k)$ & & $(1 \times k)$ & $\times$ & $(k \times k)$ &
+%$\times$ & $(k \times k)$
+$\prod^{(2)}$ & = & $\prod^{(1)}$ & $\times$ & $\bm{P}$\\
+$(1 \times k)$ & & $(1 \times k)$ & $\times$ & $(k \times k)$
+\end{tabular}
+\end{center}
+\medskip
+\pause
+\item At iteration $t$, our distribution $\prod^{(t)}$ (from which
+$\bm{\theta}^{(t)}$ is drawn) is $\prod^{(t)}  = \prod^{(t-1)} \times
+\; \bm{P} = \prod^{(0)}
+\times \; \bm{P}^t$
+\end{enumerate}
+\end{frame}
+
+\begin{frame}
+\frametitle{Stationary (Limiting) Distribution}
+\pause
+Define a stationary distribution $\pi$ to be some distribution
+$\prod$ such that $\pi = \pi \bm{P}$.  \\
+\bigskip
+\pause
+For all the MCMC algorithms we use in Bayesian statistics, the Markov
+chain will typically \textbf{converge} to $\pi$ regardless of our starting points.\\
+\bigskip
+\pause
+So if we can devise a Markov chain whose stationary distribution $\pi$
+is our desired posterior distribution $p(\bm{\theta} | y)$, then we
+can run this chain to get draws that are approximately from
+$p(\bm{\theta} | y)$ once the chain has converged.\\
+\end{frame}
+
+\begin{frame}
+\frametitle{Burn-in}
+\pause
+Since convergence usually occurs regardless of our starting point, we
+can usually pick any feasible (for example, picking starting draws
+that are in the parameter space) starting point.\\
+\bigskip
+\pause 
+However, the time it takes for the chain to converge varies depending
+on the starting point.\\
+\bigskip
+\pause
+As a matter of practice, most people throw out a certain number of the
+first draws, known as the \textbf{burn-in}.  This is to make our draws
+closer to the stationary distribution and less dependent on the
+starting point.\\
+\bigskip
+\pause
+However, it is unclear how much we should \textbf{burn-in} since our
+draws are all slightly dependent and we don't know exactly when
+convergence occurs.  
+\end{frame}
+
+\begin{frame}
+\frametitle{Monte Carlo Integration on the Markov Chain}
+\pause
+Once we have a Markov chain that has converged to the stationary
+distribution, then the draws in our chain appear to be like draws from
+$p(\bm{\theta} | y)$, \pause so it seems like we should be able to use Monte
+Carlo Integration methods to find quantities of interest.\\
+\bigskip
+\pause
+One problem: our draws are not independent, which we required for
+Monte Carlo Integration to work (remember SLLN).\\
+\bigskip
+\pause
+Luckily, we have the \textbf{Ergodic Theorem}.
+\end{frame}
+
+\begin{frame}
+\frametitle{Ergodic Theorem}
+\pause
+Let $\bm{\theta}^{(1)},\bm{\theta}^{(2)}, \dots, \bm{\theta}^{(M)}$ be
+$M$ values from a Markov chain that is \textit{aperiodic},
+\textit{irreducible}, and \textit{positive recurrent} (then the chain
+is ergodic), and $E[g(\bm{\theta})] < \infty$.\\
+\bigskip
+\pause
+Then with probability 1,
+\begin{eqnarray*}
+\frac{1}{M} \sum^{M}_{i=1} g(\bm{\theta}_i) \rightarrow \int_{\Theta}
+g(\bm{\theta}) \pi(\bm{\theta}) d\bm{\theta}
+\end{eqnarray*}
+as $M \rightarrow \infty$, where $\pi$ is the stationary distribution.\\
+\bigskip
+\pause
+This is the Markov chain analog to the SLLN, \pause and it allows us to
+ignore the dependence between draws of the Markov chain when we
+calculate quantities of interest from the draws.\\
+\bigskip
+\pause
+But what does it mean for a chain to be \textit{aperiodic},
+\textit{irreducible}, and \textit{positive recurrent}, and therefore ergodic? 
+\end{frame}
+
+\begin{frame}
+\frametitle{Aperiodicity}
+\pause
+A Markov chain is \textbf{aperiodic} if the only length of time for
+which the chain repeats some cycle of values is the trivial case with
+cycle length equal to one.\\
+\pause
+\bigskip
+Let A, B, and C denote the states (analogous to the possible values of
+$\bm{\theta}$) in a 3-state Markov chain.  \pause The following chain
+is \textit{periodic} with period 3, where the period is the number of
+steps that it takes to return to a certain state.
+\pause
+$$
+\xymatrix{
+*++[o][F-]{A} \ar@(ul,ur)^0 \ar[rr]^1 && *++[o][F-]{B}
+\ar@(ul,ur)^0 \ar[rr]^1 && *++[o][F-]{C} \ar@(ul,ur)^0 \ar@/^2pc/[llll]^1
+}
+$$
+\pause
+As long as the chain is not repeating an identical cycle, then the
+chain is \textbf{aperiodic}.
+\end{frame}
+
+\begin{frame}
+\frametitle{Irreducibility}
+\pause
+A Markov chain is \textbf{irreducible} if it is possible go from any state to
+any other state (not necessarily in one step).\\
+\bigskip
+\pause
+The following chain is \textit{reducible}, or not irreducible.
+\pause
+$$
+\xymatrix{
+*++[o][F-]{A} \ar@(ul,ur)^{0.5} \ar[rr]^{0.5} && *++[o][F-]{B}
+\ar@(ul,ur)^{0.7} \ar@/^1pc/[rr]^{0.3} && *++[o][F-]{C} \ar@(ul,ur)^{0.4} \ar@/^1pc/[ll]^{0.6}
+}
+$$
+\pause
+The chain is not irreducible because we cannot get to A from B or C
+regardless of the number of steps we take.
+\end{frame}
+
+\begin{frame}
+\frametitle{Positive Recurrence}
+\pause
+A Markov chain is \textit{recurrent} if for any given state $i$, if
+the chain starts at $i$, it will eventually return to $i$ with
+probability 1. \\
+\bigskip
+\pause
+A Markov chain is \textbf{positive recurrent} if the expected return
+time to state $i$ is finite; \pause otherwise it is \textit{null recurrent}.\\
+\pause
+\bigskip
+\bigskip
+So if our Markov chain is \textbf{aperiodic}, \textbf{irreducible},
+and \textbf{positive recurrent} (all the ones we use in
+Bayesian statistics usually are), then it is ergodic and the ergodic
+theorem allows us to do Monte Carlo Integration by calculating quantities of interest from our draws,
+ignoring the dependence between draws.
+\end{frame}
+
+\begin{frame}
+\frametitle{Thinning the Chain}
+\pause
+In order to break the dependence between draws in the Markov chain,
+some have suggested only keeping every $d$th draw of the chain. \\
+\bigskip
+\pause
+This is known as \textbf{thinning}.\\
+\bigskip
+\pause
+Pros: 
+\begin{itemize}
+\pause
+\item Perhaps gets you a little closer to i.i.d.\ draws.
+\pause
+\item Saves memory since you only store a fraction of the draws.
+\end{itemize}
+\bigskip
+\pause
+Cons:
+\begin{itemize}
+\pause
+\item Unnecessary with ergodic theorem.
+\pause
+\item Shown to increase the variance of your Monte Carlo estimates.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{So Really, What is MCMC?}
+\pause
+\blue{MC}\red{MC} is a class of methods in which we can \red{simulate
+draws} that are \blue{slightly dependent} and are
+approximately from a (posterior) distribution.  \\
+\bigskip
+\pause
+We then take those draws and calculate quantities of interest for the
+(posterior) distribution.\\
+\bigskip
+\pause
+In Bayesian statistics, there are generally two MCMC algorithms that
+we use: the Gibbs Sampler and the Metropolis-Hastings algorithm.
+\end{frame}
+
+\section{Gibbs Sampling}
+
+\begin{frame}
+\frametitle{Outline}
+\tableofcontents[currentsection]
+\end{frame}
+
+\begin{frame}
+\frametitle{Gibbs Sampling}
+\pause
+Suppose we have a joint distribution $p(\theta_1, \dots,\theta_k)$
+that we want to sample from (for example, a posterior distribution). \\  
+\bigskip
+\pause
+We can use the Gibbs sampler to sample from the joint distribution if
+we knew the \textbf{full conditional} distributions for each parameter.\\
+\bigskip
+\pause
+For each parameter, the \textbf{full conditional} distribution is the
+distribution of the parameter conditional on the known information and
+all the other parameters: \pause $p(\theta_j | \theta_{-j}, y)$\\
+\bigskip
+\pause
+How can we know the joint distribution simply by knowing the full
+conditional distributions?
+\end{frame}
+
+\begin{frame}
+\frametitle{The Hammersley-Clifford Theorem (for two blocks)}
+\pause
+Suppose we have a joint density $f(x,y)$.  \pause The theorem proves
+that we can write out the joint density in terms of the conditional
+densities $f(x|y)$ and $f(y|x)$:
+\pause
+\begin{eqnarray*}
+f(x,y) = \frac{\red{f(y|x)}}{\blue{\int \frac{f(y|x)}{f(x|y)} dy}}
+\end{eqnarray*}
+\pause
+We can write the denominator as
+\color{blue}
+\begin{eqnarray*}
+\int \frac{f(y|x)}{f(x|y)} dy &=& \int
+\frac{\frac{f(x,y)}{f(x)}}{\frac{f(x,y)}{f(y)}} dy \\
+\pause
+&=& \int \frac{f(y)}{f(x)} dy\\
+\pause
+&=& \frac{1}{f(x)}
+\end{eqnarray*}
+\color{black}
+\end{frame}
+
+\begin{frame}
+Thus, our right-hand side is
+\begin{eqnarray*}
+\frac{\red{f(y|x)}}{\blue{\frac{1}{f(x)}}} &=& \red{f(y|x)} \blue{f(x)}\\
+\pause
+&=& f(x,y)
+\end{eqnarray*}
+\pause
+The theorem shows that knowledge of the conditional densities allows
+us to get the joint density.  \\
+\pause
+\bigskip
+This works for more than two blocks of parameters. \\
+\pause
+\bigskip
+But how do we figure out the full conditionals?
+\end{frame}
+
+\begin{frame}
+\frametitle{Steps to Calculating Full Conditional Distributions}
+\pause
+Suppose we have a posterior $p(\bm{\theta} | \bm{y})$.  \pause
+To calculate the full conditionals for each $\theta$, do the following:
+\pause
+\bigskip
+\begin{enumerate}
+\item Write out the full posterior ignoring constants of proportionality.
+\pause
+\item Pick a block of parameters (for example, $\theta_1$) and drop
+everything that doesn't depend on $\theta_1$.
+\pause
+\item Use your knowledge of distributions to figure out what the
+normalizing constant is (and thus what the full
+conditional distribution $p(\theta_1 | \theta_{-1}, \bm{y})$ is).
+\pause
+\item Repeat steps 2 and 3 for all parameter blocks.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}
+\frametitle{Gibbs Sampler Steps}
+\pause
+Let's suppose that we are interested in sampling from the posterior
+$p(\bm{\theta} | \bm{y})$, where $\bm{\theta}$ is a vector of three
+parameters, $\theta_1, \theta_2, \theta_3$.\\
+\bigskip
+\pause
+The steps to a Gibbs Sampler \tiny{(and the analogous steps in
+the MCMC process)} \normalsize are
+\bigskip
+\pause
+\begin{enumerate}
+\item Pick a vector of starting values $\bm{\theta}^{(0)}$.
+\tiny{(Defining a starting distribution
+$\prod^{(0)}$ and drawing $\bm{\theta}^{(0)}$ from it.)} \normalsize
+\pause
+\medskip
+\item Start with any $\theta$ (order does not matter, but I'll start
+with $\theta_1$ for convenience). \pause Draw a value $\theta_1^{(1)}$
+from the full conditional $p(\theta_1 | \theta_2^{(0)}, \theta_3^{(0)}, \bm{y})$.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}
+\begin{enumerate}
+\item [3.] Draw a value $\theta_2^{(1)}$ (again order does not matter) from
+the full conditional  $p(\theta_2 | \theta_1^{(1)}, \theta_3^{(0)},
+\bm{y})$. \pause Note that we must use the updated value of $\theta_1^{(1)}$.
+\pause
+\medskip
+\item [4.] Draw a value $\theta_3^{(1)}$ from the full conditional
+$p(\theta_3 | \theta_1^{(1)}, \theta_2^{(1)}, \bm{y})$ using both
+updated values. \pause \tiny{(Steps 2-4 are analogous to multiplying
+$\prod^{(0)}$ and $\bm{P}$ to get $\prod^{(1)}$ and then drawing
+$\bm{\theta}^{(1)}$ from $\prod^{(1)}$.)} \normalsize
+\pause
+\medskip
+\item [5.] Draw $\bm{\theta}^{(2)}$ using $\bm{\theta}^{(1)}$ and
+continually using the most updated values.
+\pause
+\medskip
+\item [6.] Repeat until we get $M$ draws, with each draw being a vector $\bm{\theta}^{(t)}$.
+\pause
+\medskip
+\item [7.] Optional burn-in and/or thinning.
+\end{enumerate}
+\pause
+\bigskip
+Our result is a Markov chain with a bunch of draws of $\bm{\theta}$
+that are approximately from our posterior.  \pause We can do Monte
+Carlo Integration on
+those draws to get quantities of interest.
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{An Example (Robert and Casella, 10.17)\footnote{\tiny
+{Robert, Christian P. and George Casella.  2004.  \textit{Monte Carlo
+Statistical Methods, 2nd edition.}  Springer.}}}
+\pause
+\normalsize
+Suppose we have data of the number of failures ($y_i$) for each of 10 pumps in
+a nuclear plant. \\
+\pause
+\bigskip 
+We also have the times ($t_i$) at which each pump was observed.
+\medskip
+\pause
+\tiny
+\begin{Schunk}
+\begin{Sinput}
+> y <- c(5, 1, 5, 14, 3, 19, 1, 1, 4, 22)
+> t <- c(94, 16, 63, 126, 5, 31, 1, 1, 2, 10)
+> rbind(y, t)
+\end{Sinput}
+\begin{Soutput}
+  [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10]
+y    5    1    5   14    3   19    1    1    4    22
+t   94   16   63  126    5   31    1    1    2    10
+\end{Soutput}
+\end{Schunk}
+\normalsize
+\medskip
+\pause
+We want to model the number of failures with a Poisson likelihood,
+where the expected number of failure $\lambda_i$ differs for each
+pump.  \pause  Since the time which we observed each pump is
+different, we need to scale each $\lambda_i$ by its observed time $t_i$.\\
+\pause
+\bigskip
+Our likelihood is $\prod_{i=1}^{10} \mathrm{Poisson}(\lambda_i t_i)$.
+\end{frame}
+
+\begin{frame}
+Let's put a \red{Gamma($\alpha, \beta$)} prior on $\lambda_i$ with
+$\alpha = 1.8$, so the $\lambda_i$s are drawn from the same distribution.  \\
+\pause
+\bigskip
+Also, let's put a \red{Gamma($\gamma, \delta$)} prior on $\beta$, with
+$\gamma = 0.01$ and $\delta = 1$.\\
+\pause
+\bigskip 
+So our model has 11 parameters that are unknown (10 $\lambda_i$s and $\beta$).\\
+\pause
+\bigskip
+Our posterior is 
+\begin{eqnarray*}
+\blue{p(\bm{\lambda}, \beta | \bm{y}, \bm{t})} &\propto& \left( \prod_{i=1}^{10} \mathrm{Poisson}(\lambda_i
+t_i) \times  \red{\mathrm{Gamma}(\alpha, \beta)} \right) \red{\times
+\mathrm{Gamma}(\gamma, \delta)} \\
+\pause
+&=& \left( \prod_{i=1}^{10} \frac{e^{-\lambda_i t_i} (\lambda_i
+t_i)^{y_i}}{y_i !} \times \red{\frac{\beta^{\alpha}}{\Gamma (\alpha)}
+\lambda_i^{\alpha-1} e^{-\beta \lambda_i}} \right) \\
+&\phantom{=}& \red{\times \frac{\delta^{\gamma}}{\Gamma (\gamma)}
+\beta^{\gamma-1} e^{-\delta \beta} }
+\end{eqnarray*}
+\end{frame}
+
+\begin{frame}
+\begin{eqnarray*}
+\blue{p(\bm{\lambda}, \beta | \bm{y}, \bm{t})} &\propto& \left(
+\prod_{i=1}^{10} e^{-\lambda_i t_i} (\lambda_i t_i)^{y_i} \times
+\red{\beta^{\alpha} \lambda_i^{\alpha-1} e^{-\beta \lambda_i}} \right) \red{\times 
+\beta^{\gamma-1} e^{-\delta \beta} }\\
+\pause
+&=& \left( \prod_{i=1}^{10} \lambda_i^{y_i + \alpha - 1} e^{-(t_i +
+\beta)\lambda_i} \right) \beta^{10\alpha + \gamma - 1} e^{-\delta \beta}\\
+\end{eqnarray*}
+\pause
+\medskip
+Finding the full conditionals:
+\pause
+\begin{eqnarray*}
+p(\lambda_i | \lambda_{-i}, \beta, \bm{y}, \bm{t}) &\propto& \lambda_i^{y_i + \alpha - 1} e^{-(t_i +
+\beta)\lambda_i} \\
+\pause
+p(\beta | \bm{\lambda}, \bm{y}, \bm{t}) &\propto&  e^{-\beta
+(\delta + \sum_{i=1}^{10} \lambda_i)} \beta^{10\alpha + \gamma - 1}\\
+\end{eqnarray*}
+\pause
+$p(\lambda_i | \lambda_{-i}, \beta, \bm{y}, \bm{t})$ is a Gamma($y_i + \alpha, t_i + \beta$) distribution.\\
+\pause
+\bigskip
+$p(\beta | \bm{\lambda}, \bm{y}, \bm{t})$ is a Gamma($10\alpha + \gamma, \delta + \sum_{i=1}^{10}
+\lambda_i$) distribution.
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Coding the Gibbs Sampler}
+\pause
+\begin{enumerate}
+\item Define starting values for $\beta$ \pause (we only need to define
+$\beta$ here because we will draw $\bm{\lambda}$ first and it only
+depends on $\beta$ and other given values).
+\pause
+\tiny
+\medskip
+\begin{Schunk}
+\begin{Sinput}
+> beta.cur <- 1
+\end{Sinput}
+\end{Schunk}
+\bigskip
+\normalsize
+\pause
+\item Draw $\bm{\lambda}^{(1)}$ from its full conditional \pause (we're
+drawing all the $\lambda_i$s as a block because they all only depend
+on $\beta$ and not each other). 
+\tiny
+\medskip
+\pause
+\begin{Schunk}
+\begin{Sinput}
+> lambda.update <- function(alpha, beta, y, t) {
++     rgamma(length(y), y + alpha, t + beta)
++ }
+\end{Sinput}
+\end{Schunk}
+\normalsize
+\bigskip
+\pause
+\item Draw $\beta^{(1)}$ from its full conditional, using $\bm{\lambda}^{(1)}$.
+\medskip
+\tiny
+\pause
+\begin{Schunk}
+\begin{Sinput}
+> beta.update <- function(alpha, gamma, delta, lambda, y) {
++     rgamma(1, length(y) * alpha + gamma, delta + sum(lambda))
++ }
+\end{Sinput}
+\end{Schunk}
+\normalsize
+\end{enumerate}
+
+\end{frame}
+
+\begin{frame}[fragile]
+\begin{enumerate}
+\item [4.] Repeat using most updated values until we get $M$ draws.
+\pause
+\bigskip
+\item [5.] Optional burn-in and thinning.
+\bigskip
+\pause
+\item [6.] Make it into a function.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]
+\tiny
+\begin{Schunk}
+\begin{Sinput}
+> gibbs <- function(n.sims, beta.start, alpha, gamma, delta, 
++     y, t, burnin = 0, thin = 1) {
++     beta.draws <- c()
++     lambda.draws <- matrix(NA, nrow = n.sims, ncol = length(y))
++     beta.cur <- beta.start
++     lambda.update <- function(alpha, beta, y, t) {
++         rgamma(length(y), y + alpha, t + beta)
++     }
++     beta.update <- function(alpha, gamma, delta, lambda, 
++         y) {
++         rgamma(1, length(y) * alpha + gamma, delta + sum(lambda))
++     }
++     for (i in 1:n.sims) {
++         lambda.cur <- lambda.update(alpha = alpha, beta = beta.cur, 
++             y = y, t = t)
++         beta.cur <- beta.update(alpha = alpha, gamma = gamma, 
++             delta = delta, lambda = lambda.cur, y = y)
++         if (i > burnin & (i - burnin)%%thin == 0) {
++             lambda.draws[(i - burnin)/thin, ] <- lambda.cur
++             beta.draws[(i - burnin)/thin] <- beta.cur
++         }
++     }
++     return(list(lambda.draws = lambda.draws, beta.draws = beta.draws))
++ }
+\end{Sinput}
+\end{Schunk}
+
+\end{frame}
+
+\begin{frame}[fragile]
+\begin{enumerate}
+\item [7.] Do Monte Carlo Integration on the resulting Markov chain, which are
+samples approximately from the posterior.
+\medskip
+\pause
+\tiny
+\begin{Schunk}
+\begin{Sinput}
+> posterior <- gibbs(n.sims = 10000, beta.start = 1, alpha = 1.8, 
++     gamma = 0.01, delta = 1, y = y, t = t)
+> colMeans(posterior$lambda.draws)
+\end{Sinput}
+\begin{Soutput}
+ [1] 0.07113 0.15098 0.10447 0.12321 0.65680 0.62212 0.86522 0.85465
+ [9] 1.35524 1.92694
+\end{Soutput}
+\begin{Sinput}
+> mean(posterior$beta.draws)
+\end{Sinput}
+\begin{Soutput}
+[1] 2.389
+\end{Soutput}
+\begin{Sinput}
+> apply(posterior$lambda.draws, 2, sd)
+\end{Sinput}
+\begin{Soutput}
+ [1] 0.02759 0.08974 0.04012 0.03071 0.30899 0.13676 0.55689 0.54814
+ [9] 0.60854 0.40812
+\end{Soutput}
+\begin{Sinput}
+> sd(posterior$beta.draws)
+\end{Sinput}
+\begin{Soutput}
+[1] 0.6986
+\end{Soutput}
+\end{Schunk}
+\end{enumerate}
+\end{frame}
+
+\section{The Metropolis-Hastings Algorithm}
+
+\begin{frame}
+\frametitle{Outline}
+\tableofcontents[currentsection]
+\end{frame}
+
+\begin{frame}
+Suppose we have a posterior $\blue{p(\bm{\theta} | \bm{y})}$ that we want to
+sample from, but
+\pause
+\begin{itemize}
+\item the posterior doesn't look like any distribution we know (no conjugacy)
+\pause
+\item the posterior consists of more than 2 parameters (grid
+approximations intractable)
+\pause
+\item some (or all) of the full conditionals do not look like any
+distributions we know (no Gibbs sampling for those whose full
+conditionals we don't know)
+\end{itemize}
+\pause
+\bigskip
+If all else fails, we can use the \textbf{Metropolis-Hastings}
+algorithm, which will always work.
+\end{frame}
+
+\begin{frame}
+\frametitle{Metropolis-Hastings Algorithm}
+\pause
+The Metropolis-Hastings Algorithm follows the following steps:
+\pause
+\bigskip
+\begin{enumerate}
+\item Choose a starting value $\bm{\theta}^{(0)}$.
+\pause
+\item At iteration $t$, draw a candidate $\bm{\theta}^*$ from a jumping
+distribution $J_t(\bm{\theta}^* | \bm{\theta}^{(t-1)})$.
+\pause
+\item Compute an acceptance ratio (probability):
+\begin{eqnarray*}
+r = \frac{p(\bm{\theta}^* | \bm{y})/J_t(\bm{\theta}^* | \bm{\theta}^{(t-1)})}{p(\bm{\theta}^{(t-1)} | \bm{y})/J_t(\bm{\theta}^{(t-1)} | \bm{\theta}^*)}
+\end{eqnarray*}
+\pause
+\item Accept $\bm{\theta}^*$ as $\bm{\theta}^{(t)}$ with probability
+min($r,1$).  If $\bm{\theta}^*$ is not accepted, then $\bm{\theta}^{(t)} = \bm{\theta}^{(t-1)}$.
+\pause
+\item Repeat steps 2-4 $M$ times to get $M$ draws from $\blue{p(\bm{\theta}
+| \bm{y})}$, with optional burn-in and/or thinning.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}
+\frametitle{Step 1: Choose a starting value $\bm{\theta}^{(0)}$.}
+\pause
+This is equivalent to drawing from our initial stationary distribution.\\
+\bigskip
+\pause
+The important thing to remember is that $\bm{\theta}^{(0)}$ must have
+positive probability.
+\begin{eqnarray*}
+p(\bm{\theta}^{(0)} | \bm{y}) > 0
+\end{eqnarray*}
+\bigskip
+\pause
+Otherwise, we are starting with a value that cannot be drawn.
+\end{frame}
+
+\begin{frame}
+\frametitle{Step 2: Draw $\bm{\theta}^*$ from $J_t(\bm{\theta}^* | \bm{\theta}^{(t-1)})$.}
+\pause
+The jumping distribution  $J_t(\bm{\theta}^* | \bm{\theta}^{(t-1)})$
+determines where we move to in the next iteration of the Markov chain
+(analogous to the transition kernel).
+\pause
+The support of the jumping distribution must contain the support of
+the posterior. \\
+\pause
+\bigskip
+The original \textbf{Metropolis algorithm} required that
+$J_t(\bm{\theta}^* | \bm{\theta}^{(t-1)})$ be a symmetric
+distribution (such as the normal distribution), \pause that is
+\begin{eqnarray*}
+ J_t(\bm{\theta}^* | \bm{\theta}^{(t-1)}) = J_t(\bm{\theta}^{(t-1)} | \bm{\theta}^*)
+\end{eqnarray*}
+\pause
+We now know with the Metropolis-Hastings algorithm that symmetry is
+unnecessary.  \\
+\bigskip
+\pause
+If we have a symmetric jumping distribution that is dependent on
+$\bm{\theta}^{(t-1)}$, then we have what is known as \textbf{random walk Metropolis sampling}.
+\end{frame}
+
+\begin{frame}
+If our jumping distribution does not depend on $\bm{\theta}^{(t-1)}$, 
+\pause
+\begin{eqnarray*}
+J_t(\bm{\theta}^* | \bm{\theta}^{(t-1)}) = J_t(\bm{\theta}^*)
+\end{eqnarray*}
+\pause
+then we have what is known as \textbf{independent Metropolis-Hastings sampling}.\\
+\bigskip
+\pause
+Basically all our candidate draws $\bm{\theta}^*$ are drawn from the
+same distribution, regardless of where the previous draw was.\\
+\bigskip
+\pause
+This can be extremely efficient or extremely inefficient, depending on
+how close the jumping distribution is to the posterior.\\
+\bigskip
+\pause
+Generally speaking, chain will behave well only if the jumping
+distribution has heavier tails than the posterior.
+\end{frame}
+
+\begin{frame}
+\frametitle{Step 3: Compute acceptance ratio $r$.}
+\pause
+\begin{eqnarray*}
+r = \frac{p(\bm{\theta}^* | \bm{y})/J_t(\bm{\theta}^* | \bm{\theta}^{(t-1)})}{p(\bm{\theta}^{(t-1)} | \bm{y})/J_t(\bm{\theta}^{(t-1)} | \bm{\theta}^*)}
+\end{eqnarray*}
+\pause
+In the case where our jumping distribution is symmetric,
+\begin{eqnarray*}
+r = \frac{p(\bm{\theta}^* | \bm{y})}{p(\bm{\theta}^{(t-1)} | \bm{y})}
+\end{eqnarray*}
+\pause
+If our candidate draw has higher probability than our current draw,
+then our candidate is better so we definitely accept it.  \pause
+Otherwise, our candidate is accepted according to the ratio of the
+probabilities of the candidate and current draws. \\
+\bigskip
+\pause
+Note that since $r$ is a ratio, we only need $\blue{p(\bm{\theta} |
+\bm{y})}$ \textit{up to a constant of proportionality} since
+$p(\bm{y})$ cancels out in both the numerator and denominator.
+\end{frame}
+
+\begin{frame}
+In the case where our jumping distribution is not symmetric,
+\begin{eqnarray*}
+r = \frac{p(\bm{\theta}^* | \bm{y})/J_t(\bm{\theta}^* | \bm{\theta}^{(t-1)})}{p(\bm{\theta}^{(t-1)} | \bm{y})/J_t(\bm{\theta}^{(t-1)} | \bm{\theta}^*)}
+\end{eqnarray*}
+\pause
+We need to weight our evaluations of the draws at the posterior
+densities by how likely we are to draw each draw.  \\
+\bigskip
+\pause
+For example, if we are very likely to jump to some $\bm{\theta}^*$,
+then $J_t(\bm{\theta}^* | \bm{\theta}^{(t-1)})$ is likely to be high,
+so we should accept less of them than some other $\bm{\theta}^*$ that
+we are less likely to jump to.\\
+\pause
+\bigskip
+In the case of independent Metropolis-Hastings sampling,
+\begin{eqnarray*}
+r = \frac{p(\bm{\theta}^* | \bm{y})/J_t(\bm{\theta}^*)}{p(\bm{\theta}^{(t-1)} | \bm{y})/J_t(\bm{\theta}^{(t-1)})}
+\end{eqnarray*}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Step 4: Decide whether to accept $\bm{\theta}^*$.}
+\pause
+Accept $\bm{\theta}^*$ as $\bm{\theta}^{(t)}$ with probability
+min($r,1$).  If $\bm{\theta}^*$ is not accepted, then
+$\bm{\theta}^{(t)} = \bm{\theta}^{(t-1)}$. \\
+\bigskip
+\pause
+\begin{enumerate}
+\item For each $\bm{\theta}^*$, draw a value $u$ from the Uniform(0,1)
+distribution.
+\pause
+\item If $u \le r$, accept $\bm{\theta}^*$ as $\bm{\theta}^{(t)}$.
+Otherwise, use $\bm{\theta}^{(t-1)}$ as $\bm{\theta}^{(t)}$
+\end{enumerate}
+\pause
+\bigskip
+Candidate draws with higher density than the current draw are always accepted.\\
+\bigskip
+\pause
+Unlike in rejection sampling, each iteration always produces a draw,
+either $\bm{\theta}^*$ or $\bm{\theta}^{(t-1)}$.
+\end{frame}
+
+\begin{frame}
+\frametitle{Acceptance Rates}
+\pause
+It is important to monitor the \textit{acceptance rate} (the fraction of
+candidate draws that are accepted) of your Metropolis-Hastings algorithm.\\
+\pause
+\bigskip
+If your acceptance rate is too high, the chain is probably not mixing
+well (not moving around the parameter space quickly enough).\\
+\pause
+\bigskip
+If your acceptance rate is too low, your algorithm is too inefficient
+(rejecting too many candidate draws).\\
+\pause
+\bigskip
+What is too high and too low depends on your specific algorithm, but generally
+\pause
+\begin{itemize}
+\item random walk: somewhere between 0.25 and 0.50 is recommended
+\pause
+\item independent: something close to 1 is preferred
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{A Simple Example}
+\pause
+Using a random walk Metropolis algorithm to sample from a Gamma(1.7,
+4.4) distribution with a Normal jumping distribution with standard
+deviation of 2.
+\medskip
+\pause
+\tiny
+\begin{Schunk}
+\begin{Sinput}
+> mh.gamma <- function(n.sims, start, burnin, cand.sd, shape, rate) {
++     theta.cur <- start
++     draws <- c()
++     theta.update <- function(theta.cur, shape, rate) {
++         theta.can <- rnorm(1, mean = theta.cur, sd = cand.sd)
++         accept.prob <- dgamma(theta.can, shape = shape, rate = rate)/dgamma(theta.cur, 
++             shape = shape, rate = rate)
++         if (runif(1) <= accept.prob) 
++             theta.can
++         else theta.cur
++     }
++     for (i in 1:n.sims) {
++         draws[i] <- theta.cur <- theta.update(theta.cur, shape = shape, 
++             rate = rate)
++     }
++     return(draws[(burnin + 1):n.sims])
++ }
+> mh.draws <- mh.gamma(10000, start = 1, burnin = 1000, cand.sd = 2, 
++     shape = 1.7, rate = 4.4)
+\end{Sinput}
+\end{Schunk}
+\end{frame}
+
+
+\end{document}

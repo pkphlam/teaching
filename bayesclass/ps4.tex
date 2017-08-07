@@ -1,0 +1,70 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[latin1]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{fullpage}
+\usepackage{color}
+
+\author{Patrick Lam}
+
+\parindent=0in
+\newcommand{\red}{\color{red}}
+\newcommand{\black}{\color{black}}
+\begin{document}
+
+\begin{center}
+\begin{Large}Week 4 Problems\end{Large}
+\end{center}
+\bigskip
+\begin{enumerate}
+
+\item (Adapted from Gelman 2.10) Suppose there are $N$ cable cars in San Francisco, numbered sequentially from 1 to $N$.  You see a cable car at random; it is numbered 203.  You wish to estimate $N$. \\
+
+Assume your prior distribution on $N$ is geometric with mean 100; that is,
+\begin{eqnarray*}
+p(N) = (1/100)(99/100)^{N-1}, \; \mathrm{for} \; N = 1,2,\dots
+\end{eqnarray*}
+
+\begin{itemize}
+\item[a)] What is your posterior distribution for $N$ up to a constant of proportionality?   
+\item[b)] Find the posterior mean and standard deviation by approximating the normalizing constant in R (without simulating). 
+\item[c)] Now find the posterior mean and standard deviation by simulation in R.  Are your answers similar to those in b)?
+\end{itemize}
+
+\bigskip
+
+\item (adapted from Gelman 3.2) On September 25, 1988, the evening of a Presidential campaign debate, ABC News conducted a survey of registered voters in the United States; 639 persons were polled before the debate, and 639 different persons were polled after.  \\
+
+\begin{table}[!htp]
+\begin{center}
+\begin{tabular}{ccccc}
+Survey & Bush & Dukakis & No opinion/other & Total \\
+\hline
+pre-debate & 294 & 307 & 38 & 639 \\
+post-debate & 288 & 332 & 19 & 639 \\
+\end{tabular}
+\end{center}
+\end{table}
+
+Assume the surveys are independent simple random samples from the population of registered voters.  Model the data with two different multinomial distributions.
+\begin{enumerate}
+\item[a)] What is the posterior probability that support for Bush increased between the two surveys?
+\item[b)] Of the voters who had a preference for either Bush or Dukakis, what is the posterior probability that there was a shift toward Bush between the two surveys?
+\end{enumerate}
+
+\bigskip
+
+\item Suppose we have $n$ observations that follow a Normal distribution with a common mean $\mu$ and variance $\sigma^2$.  Also, suppose that we know the mean of the data, but want to learn about the variance of the data.  Find the posterior distribution of the variance $\sigma^2$ given an Inverse-gamma prior.  Specifically, find $p(\sigma^2 | \mathbf{y})$ given
+\begin{eqnarray*}
+Y_i &\sim& \text{N}(\mu, \sigma^2) \\
+\sigma^2 &\sim& \text{Inv-gamma}(\alpha, \beta)
+\end{eqnarray*}
+\end{enumerate}
+
+\end{document}
+
+
+
+
+

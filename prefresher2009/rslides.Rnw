@@ -1,0 +1,1741 @@
+\documentclass[handout]{beamer}
+
+\usepackage{color}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{multicol}
+\usepackage{bm}
+
+\title{Learning R}
+\author{Patrick Lam}
+\date{}
+
+\newcommand{\red}{\color{red}}
+\newcommand{\black}{\color{black}}
+
+\begin{document}
+\maketitle
+
+
+\begin{frame}
+\frametitle{setting up}
+\pause
+\begin{itemize}
+\item download R from CRAN
+\item work in the console (code not saved)
+\item open a script, type code in script, and save as a .R file
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\begin{center}
+Example code is in \red{red}
+\end{center}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{R as calculator}
+\pause
+\red
+<<>>=
+5+4
+@
+\pause
+\bigskip 
+<<>>=
+8*2-sqrt(9)
+@
+\pause
+\bigskip
+<<>>=
+log(4)/9^2
+@
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{objects}
+R is an object-oriented programming language.  \pause Use \red\verb <- \black\hspace{1pt} as assignment operator for objects.
+\pause
+\bigskip
+\red
+<<>>=
+5+4
+@
+\pause
+<<>>=
+my.sum <- 5+4; my.sum
+@
+\pause
+\bigskip
+<<>>=
+my.name <- "Patrick"
+my.name
+@
+\black
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{vectors}
+All objects consist of one or more \textbf{vectors}. \\
+\pause
+\bigskip
+vector: a combination of elements (i.e. numbers, words), usually created using \red{\tt c()}\black, \red{\tt seq()}\black, or \red{\tt rep()}\black
+\end{frame}
+
+\begin{frame}[fragile]
+\red
+<<>>=
+empty.vector <- c()
+empty.vector
+@
+\pause
+\bigskip
+<<>>=
+one.to.five <- c(1,2,3,4,5)
+one.to.five
+@
+\pause
+\bigskip
+<<>>=
+poli.sci <- c("theory", "amer.", "comp.", "ir")
+poli.sci
+@
+\end{frame}
+
+\begin{frame}[fragile]
+\red
+<<>>=
+one.to.ten <- 1:10
+one.to.ten
+@
+\pause
+\bigskip
+<<>>=
+two.to.five <- seq(from=2, to=5, by=1)
+two.to.five
+@
+\pause
+\bigskip
+<<>>=
+all.fours <- rep(4, times=5)
+all.fours
+@
+\end{frame}
+
+\begin{frame}
+\begin{center}
+All elements in a vector must be of the same data type!
+\end{center}
+\end{frame}
+
+\section{Data Types}
+\begin{frame}
+\frametitle{data types}
+\begin{itemize}
+\item numeric
+\item character
+\item logical
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+numeric: numbers
+\pause
+\bigskip
+\red
+<<>>=
+three <- 3
+three
+@
+\pause
+\bigskip
+<<>>=
+is.numeric(three)
+@
+\pause
+\bigskip
+<<>>=
+as.numeric("3")
+@
+\black
+\end{frame}
+
+\begin{frame}[fragile]
+character: for example, words or phrases (must be in "")
+\pause
+\bigskip
+\red
+<<>>=
+president <- "Barack Obama"
+president
+@
+\pause
+\bigskip
+<<>>=
+is.character(president)
+@
+\pause
+\bigskip
+<<>>=
+as.character(3)
+@
+\black
+\end{frame}
+
+\begin{frame}[fragile]
+logical: {\tt TRUE (T)} or {\tt FALSE (F)}
+\pause
+\bigskip
+\red
+<<>>=
+num.vec <- c(5,6,4)
+logical.vec <- num.vec == 6
+logical.vec
+@
+\pause
+<<>>=
+is.logical(logical.vec)
+@
+\pause
+\black
+\bigskip
+can also be represented as numeric 1 or 0:
+\pause
+\red
+\bigskip
+<<>>=
+as.numeric(logical.vec)
+@
+\black
+\end{frame}
+
+\begin{frame}[fragile]
+\begin{center}
+All elements in a vector must be of the same data type!
+\end{center}
+\pause
+\begin{itemize}
+\item if a vector has a character element, all elements become character
+\pause
+\red
+<<>>=
+mixed.vec <- c(5, "Patrick", TRUE)
+mixed.vec
+@
+\black
+\pause
+\bigskip
+\item if a vector has both numeric and logical elements, all elements become numeric
+\pause
+\red
+<<>>=
+mixed.vec2 <- c(10, FALSE)
+mixed.vec2
+@
+\black
+\pause
+\bigskip
+\end{itemize}
+\begin{center}
+character $>$ numeric $>$ logical
+\end{center}
+
+\end{frame}
+
+\section{Object Classes}
+\begin{frame}
+\frametitle{object classes}
+All objects consist of one or more vectors. \\
+\pause
+\bigskip
+In addition to vector, objects can be of one of the following classes:
+\pause
+\begin{itemize}
+\item matrix
+\item array
+\item dataframe
+\item list
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{matrix}
+A matrix is a two-dimensional ($r \times c$) object (think a bunch of stacked or side-by-side vectors).
+\pause
+\bigskip
+\red
+<<>>=
+a.matrix <- matrix(c(1,2,3,4), nrow=2, ncol=2)
+a.matrix
+@
+\pause
+<<>>=
+class(a.matrix)
+@
+\black
+\pause
+\bigskip
+\begin{center}
+ All elements in a matrix must be of the same data type. \\
+ \pause
+ character $>$ numeric $>$ logical
+ \end{center}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{array}
+An array is a three-dimensional ($r \times c \times h$) object (think a bunch of stacked $r \times c$ matrices). \\
+\pause
+\bigskip
+All elements in an array must be of the same data type (character $>$ numeric $>$ logical).
+\end{frame}
+
+\begin{frame}[fragile]
+\footnotesize
+\red
+<<>>=
+an.array <- array(0, dim=c(2,2,3))
+an.array
+@
+\normalsize
+\end{frame}
+
+\begin{frame}
+\frametitle{dataframe}
+A dataframe is a two-dimensional ($r \times c$) object (like a matrix).
+\pause
+\begin{itemize}
+\item each column must be of the same data type, but data type may vary by column
+\pause
+\item regression and other statistical functions usually use dataframes
+\pause
+\item use \red{\tt as.data.frame()} \black to convert matrices to dataframes 
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{list}
+A list is a set of objects.\\
+\pause
+\bigskip
+Each element in a list can be a(n):
+\begin{itemize}
+\item vector
+\item matrix
+\item array
+\item dataframe
+\item list
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\red
+\footnotesize
+<<>>=
+a.vec <- 6:10
+a.matrix <- matrix(3, nrow=2, ncol=2)
+a.dataframe <- as.data.frame(a.matrix)
+a.list <- list(a.vec, a.matrix, a.dataframe)
+a.list
+@
+\black
+\normalsize
+\end{frame}
+
+\begin{frame}
+\frametitle{brief review}
+\pause
+\begin{center}
+\begin{tikzpicture}
+[class/.style={rectangle, draw=blue, blue}, type/.style={rectangle, draw=red, red}]
+
+\node (num) at (0,0) [class] {numeric};
+\node (char) at (2,0) [class] {character};
+\node (logic) at (4,0) [class] {logical};
+\node [blue,right] at (6,0) {data types};
+
+\pause
+\node (vec) at (2,1.5) [type] {vector}
+  edge [<-, bend right = 15] (num)
+  edge [<-] (char)
+  edge [<-, bend left = 15] (logic);
+\node [red,right] at (6,3.75) {object classes};
+  
+\pause
+\node (mat) at (0,3) [type] {matrix}
+  edge [<-, bend right = 15] (vec);
+\node (dat) at (4,3) [type] {dataframe}
+  edge [<-, bend left = 15] (vec);
+
+\pause
+\node (arr) at (0,4.5) [type] {array}
+  edge [<-] (mat);
+
+\pause
+\node (list1) at (4,6) [type] {list};
+\node (list) at (2,6) [type] {list}
+  edge [<-] (vec)
+  edge [<-, bend right = 15] (arr)
+  edge [<-] (mat)
+  edge [<-, bend left = 25] (dat)
+  edge [<-] (list1);
+
+\end{tikzpicture}
+\end{center}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{exercises}
+\begin{enumerate}
+\item Create a vector of integers from 1 to 20.  
+\item In one line of code, add 2, multiply by 5, take the square root, and then take the log of each element in the vector.
+\item Create a vector of your 5 favorite cities.
+\item Create a $3 \times 3$ matrix where each element of every column corresponds to the column number.
+\item Convert this matrix into a dataframe.
+\item Create a $3 \times 5 \times 2$ array of all 0s.
+\item Create a list containing your array, your dataframe and your two vectors. 
+\end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{solutions}
+\footnotesize
+\begin{enumerate}
+\item \red \footnotesize 
+<<>>=
+ans.1 <- 1:20
+@
+\item \red \footnotesize
+<<>>=
+ans.2 <- log(sqrt((ans.1 + 2)*5))
+@
+\item \red \footnotesize
+<<>>=
+ans.3 <- c("Los Angeles", "Las Vegas", "Hong Kong", "San Francisco", "Boston")
+@
+\item \red \footnotesize
+<<>>=
+ans.4 <- matrix(c(1,2,3), ncol=3, nrow=3, byrow=T)
+@
+\item \red \footnotesize
+<<>>=
+ans.5 <- as.data.frame(ans.4)
+@
+\item
+<<>>=
+ans.6 <- array(0, dim=c(3,5,2))
+@
+\item 
+<<>>=
+ans.7 <- list(ans.6, ans.5, ans.3, ans.2)
+@
+\end{enumerate}
+\end{frame}
+
+\section{Combining Objects}
+\begin{frame}[fragile]
+\frametitle{combining objects}
+To combine vectors together or lists together, use \red{\tt c()}\black
+\pause
+\bigskip
+\red
+<<>>=
+vec1 <- c(4,6,9)
+vec2 <- 10:15
+comb.vec <- c(vec1, vec2)
+comb.vec
+@
+\end{frame}
+
+\begin{frame}[fragile]
+To combine matrices or dataframes with other matrices, dataframes, or vectors, use \red{\tt cbind()} \black or \red{\tt rbind()}\black
+\footnotesize
+\pause
+\bigskip
+\red
+<<>>=
+a.matrix <- matrix(0, nrow=2, ncol=3)
+@
+\pause
+<<>>=
+rbind(a.matrix, 1:3)
+@
+\pause
+<<>>=
+cbind(a.matrix, a.matrix)
+@
+\normalsize
+\black
+\pause
+\bigskip
+Dimensions must match (think layered cake, not wedding cake).
+\end{frame}
+
+\section{Names}
+\begin{frame}
+\frametitle{names}
+It's helpful to give names to elements or rows/columns within objects (i.e. variable names).\\
+\pause
+\bigskip
+Use
+\begin{itemize}
+\item \red{\tt names()} \black for vectors, dataframes and lists
+\pause
+\item \red{\tt rownames()} \black and \red{\tt colnames()}\black for matrices and dataframes
+\pause
+\item \red{\tt dimnames()} \black for arrays
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\red
+<<>>=
+leaders <- c("Obama", "Brown", "Merkel")
+names(leaders) <- c("US", "UK", "Germany")
+leaders
+@
+\pause
+\bigskip
+<<>>=
+country.names <- names(leaders)
+country.names
+@
+\end{frame}
+
+\begin{frame}[fragile]
+\red
+<<>>=
+leader <- c("Obama", "Brown", "Merkel")
+year <- rep(2009, times=3)
+dataset <- data.frame(cbind(leader, year))
+@
+\pause
+<<>>=
+names(dataset) <- c("leader", "year")
+dataset
+@
+\pause
+\bigskip
+\black
+\begin{itemize}
+\item \red{\tt names()} \black and \red{\tt colnames()} \black are the same for dataframes only
+\pause
+\item must use \red{\tt colnames()}\black for matrices
+\end{itemize}
+<<>>=
+
+@
+\end{frame}
+
+\section{Indexing and Subsetting}
+\begin{frame}[fragile]
+\frametitle{indexing}
+Elements within objects are indexed using {\tt []} and {\tt [[]]}.
+\pause
+\bigskip
+\begin{itemize}
+\item vectors: {\tt [i]} for the ith element
+\pause
+\item matrices and dataframes: {\tt [i,j]} for the ith row, jth column
+\pause
+\item arrays: {\tt [i,j,k]} for the ith row, jth column, kth level
+\pause
+\item lists: [[i]] for the ith element
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+vectors:
+\bigskip
+\red
+\footnotesize
+<<>>=
+leaders
+@
+\pause
+\bigskip
+<<>>=
+leaders[2]
+@
+\pause
+\bigskip
+<<>>=
+leaders[c(1,3)]
+@
+\end{frame}
+
+\begin{frame}[fragile]
+\red
+\footnotesize
+<<>>=
+leaders["US"]
+@
+\pause
+\bigskip
+<<>>=
+leaders[-3]
+@
+\end{frame}
+
+\begin{frame}[fragile]
+matrices and dataframes:
+\bigskip
+\red
+\footnotesize
+<<>>=
+dataset
+@
+\pause
+\bigskip
+<<>>=
+dataset[2,1]
+@
+\pause
+\bigskip
+<<>>=
+dataset[2,]
+@
+\end{frame}
+
+\begin{frame}[fragile]
+\footnotesize
+\red
+<<>>=
+dataset[,"year"]
+@
+\pause
+\bigskip
+<<>>=
+dataset[,-1]
+@
+\pause
+\bigskip
+\black
+\normalsize
+for datasets:
+\red
+\footnotesize
+\pause
+\bigskip
+<<>>=
+dataset$leader
+@
+\end{frame}
+
+\begin{frame}[fragile]
+lists:
+\bigskip
+\red
+\footnotesize
+<<>>=
+my.list <- list(mat=a.matrix, vec=leaders)
+my.list
+@
+\pause
+<<>>=
+names(my.list)
+@
+\end{frame}
+
+\begin{frame}[fragile]
+\red
+\footnotesize
+<<>>=
+my.list[[2]]
+@
+\pause
+\bigskip
+<<>>=
+my.list[[2]][2]
+@
+\pause
+\bigskip
+<<>>=
+my.list$mat
+@
+\end{frame}
+
+\section{Editing and Subsetting Objects}
+\begin{frame}[fragile]
+\frametitle{editing objects}
+Now that we know indexing, editing and subsetting objects is trivial.\\
+\pause
+\bigskip
+For example, we can add to an object (such as adding a variable to a dataset):
+\pause
+\bigskip
+\red
+\footnotesize
+<<>>=
+dataset$europe <- c(0,0,1)
+dataset
+@
+\end{frame}
+
+\begin{frame}[fragile]
+or edit an object:
+\red
+\pause
+\bigskip
+\footnotesize
+<<>>=
+dataset[2,"europe"] <- 1
+dataset
+@
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{subsetting objects}
+with logical statements:
+\bigskip
+\pause
+\red
+\footnotesize
+<<>>=
+dataset$europe == 1
+@
+\pause
+<<>>=
+dataset[dataset$europe == 1,]
+@
+\normalsize
+\pause
+\bigskip
+\black
+{\tt $==$, \pause $!=$, \pause $>$, \pause $<$, \pause $>=$, \pause $<=$\\
+$\&$, \pause $\mid$, \pause \%in\% }
+\end{frame}
+
+\section{The R Environment}
+\begin{frame}[fragile]
+\frametitle{the R environment}
+Any objects you create will be stored in the R environment. \\
+\pause
+\bigskip
+To see all the objects in your environment:
+\pause
+\red
+\footnotesize
+<<>>=
+ls()
+@
+\normalsize
+\black
+\pause
+\bigskip
+To remove an object:
+\pause
+\red
+\footnotesize
+<<>>=
+rm(vec1)
+@
+\end{frame}
+
+\section{Packages}
+\begin{frame}
+\frametitle{packages}
+To use packages, you need to install them (do this once) and load them (every time you open R).\\
+\pause
+\bigskip
+To install a package named {\tt foo}:
+\pause
+\begin{enumerate}
+\item type \red{\tt install.packages("foo")}\black
+\pause
+\item choose a CRAN repository
+\end{enumerate}
+\bigskip
+\pause
+To load a package named {\tt foo}:
+\pause
+\begin{enumerate}
+\item type \red{\tt library(foo)}\black
+\end{enumerate}
+\end{frame}
+
+\section{Loading Data}
+\begin{frame}
+\frametitle{loading datasets}
+Suppose you want to load the {\tt foo} dataset. \\
+\pause
+\bigskip
+If the dataset is in
+\begin{itemize}
+\item an existing R package, load the package and type \red{\tt data(foo)}\black
+\pause
+\item .RData format, type \red{\tt load(foo)}\black
+\pause
+\item .txt or other text formats, type \red{\tt read.table("foo.txt")}\black
+\pause
+\item .csv format, type \red{\tt read.csv("foo.csv")}\black
+\pause
+\item .dta (Stata) format, load the {\tt foreign} library and type \red{\tt read.dta("foo.dta")}\black
+\end{itemize}
+\pause
+\bigskip
+To save objects into these formats, use the equivalent \red {\tt write.table()}\black, \red{\tt write.csv()}\black, etc. commands. 
+\end{frame}
+
+\section{Working Directory}
+\begin{frame}
+\frametitle{working directory}
+When loading or saving a dataset or object, R will look in the current working directory.\\
+\pause
+\bigskip
+If your working directory is not where the file is at, R will not find it, so make sure you change the working directory.
+\pause
+\bigskip
+\begin{itemize}
+\item to change to the {\tt foo} working directory, use \red {\tt setwd("foo")} \black
+\pause
+\item to see the current working directory, type \red {\tt getwd()} \black
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{exercises}
+\begin{enumerate}
+\item Load the {\tt macro} dataset from the {\tt Zelig} package.
+\item Change the name of the ``year" variable in the dataset to ``date".
+\item Add a column of just 1s to the left of the dataset.
+\item Create a vector with just the ``trade" variable from the dataset.
+\item Create a new dataset with all the observations where "gdp" is greater than 3.25 and ``unem" is less than 5.
+\item Write this new smaller dataset as a separate file into your working directory in any format (i.e. .csv, .dta, .txt)
+\item Store the large dataset, the ``trade" vector, and the new smaller dataset in a list with appropriate names.  Then extract the ``trade" vector from the list.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{solutions}
+\begin{enumerate}
+\red
+\footnotesize
+\item 
+<<>>=
+library(Zelig)
+data(macro)
+@
+\item 
+<<>>=
+names(macro)[2] <- "date"
+@
+\item
+<<>>=
+new.macro <- cbind(1, macro)
+@
+\item 
+<<>>=
+just.trade <- macro$trade
+@
+\item
+<<>>=
+macro.subset <- macro[macro$gdp > 3.25 & macro$unem < 5,]
+@
+\item
+<<>>=
+write.csv(macro.subset, file="macrosubset.csv")
+@
+\item 
+<<>>=
+my.list <- list(large=new.macro, small=macro.subset, trade=just.trade)
+pull.out.trade <- my.list$trade
+@
+\end{enumerate}
+\end{frame}
+
+\section{Analyzing Vectors}
+\begin{frame}
+\frametitle{analyzing vectors}
+\pause
+\begin{itemize}
+\red
+\item {\tt mean()}
+\item {\tt median()}
+\item {\tt sd()}
+\item {\tt var()}
+\item {\tt cor()}
+\item {\tt cov()}
+\item {\tt quantile()}
+\item {\tt max()}
+\item {\tt min()}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{other vector functions}
+\pause
+\begin{itemize}
+\red
+\item {\tt sum()}
+\item {\tt prod()}
+\item {\tt length()}
+\item {\tt table()}
+\item {\tt unique()}
+\item {\tt sort()}
+\item {\tt order()}
+\item {\tt which()} \black with logical statements
+\end{itemize}
+\end{frame}
+
+\section{Analyzing Dataframes and Matrices}
+\begin{frame}
+\frametitle{analyzing dataframes and matrices}
+\pause
+\begin{itemize}
+\red
+\item {\tt head()}
+\item {\tt tail()}
+\item {\tt nrow()}
+\item {\tt ncol()}
+\item {\tt summary()}
+\item {\tt colMeans()}
+\item {\tt rowMeans()}
+\item {\tt colSums()}
+\item {\tt rowSums()}
+\item {\tt View()}
+\item {\tt edit()}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{exercises}
+\pause
+\begin{enumerate}
+\item Reload the {\tt macro} dataset from {\tt Zelig}.  Find the mean, median, standard deviation, and 20th and 80th percent quantiles of the unemployment variable.
+\item How many observations are there in this dataset?
+\item What's the correlation between trade and gdp?
+\item Which country-year observation had the highest unemployment rate in the dataset?
+\item Which country had the most number of years where gdp > 5?
+\end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{solutions}
+\begin{enumerate}
+\red
+\footnotesize
+\item
+<<>>=
+data(macro)
+mean(macro$unem)
+median(macro$unem)
+sd(macro$unem)
+quantile(macro$unem, probs=c(.2,.8))
+@
+\item
+<<>>=
+nrow(macro)
+@
+\end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]
+\begin{enumerate}
+\red
+\footnotesize
+\item[3.]
+<<>>=
+cor(macro$trade, macro$gdp)
+@
+\item[4.]
+<<>>=
+macro[macro$unem == max(macro$unem), c("country", "year")]
+@
+\item[5.]
+<<>>=
+tally <- table(macro$country[macro$gdp > 5])
+names(tally)[tally == max(tally)]
+@
+\end{enumerate}
+\end{frame}
+
+\section{Functions}
+\begin{frame}
+\frametitle{functions}
+One last object class that we have yet to mention are {\bf functions}.\\
+\bigskip
+\pause
+Basically everything in R is performing a function on an object.\\
+\pause
+\bigskip
+Recall a function in math:
+\pause
+\begin{center}
+\begin{tikzpicture}
+[func/.style={rectangle, draw=blue, blue}, type/.style={rectangle, draw=red, red}]
+
+\node (inp) [black,left] at (0,0) {input(s)};
+\node (func) at (2,0) [func] {function}
+ edge[<-] (inp);
+\node [black,right] at (4,0) {one output}
+ edge[<-](func);
+
+\end{tikzpicture}
+\end{center}
+\pause
+\bigskip
+Functions in R:
+\pause
+\begin{center}
+\begin{tikzpicture}
+[func/.style={rectangle, draw=red, red}, type/.style={rectangle, draw=red, red}]
+
+\node (inp) [black,left] at (0,0) {object(s) (arguments)};
+\node (func) at (2,0) [func] {function}
+ edge[<-] (inp);
+\node [black,right] at (4,0) {one object}
+ edge[<-](func);
+
+\end{tikzpicture}
+\end{center}
+\pause
+\bigskip
+Up to now, we've used many canned functions, but we will also need to write our own functions.
+\end{frame}
+
+\begin{frame}[fragile]
+$f(x,y) = x^2 + y^2$
+\pause
+\bigskip
+\red
+\footnotesize
+<<>>=
+xy.func <- function(x,y){
+  f.xy <- x^2 + y^2
+  return(f.xy)
+}
+@
+\pause
+<<>>=
+xy.func(x=3, y=4)
+@
+\pause
+\black
+\normalsize
+or
+\pause
+\footnotesize
+\red
+<<>>=
+xy.func <- function(vec){
+  x <- vec[1]
+  y <- vec[2]
+  f.xy <- x^2 + y^2
+  return(f.xy)
+}
+@
+\pause
+<<>>=
+xy.func(vec=c(3,4))
+@
+\end{frame}
+
+\begin{frame}[fragile]
+a function that deletes the first $p$ percent of observations from a dataframe
+\pause
+\red
+\footnotesize
+\bigskip
+<<keep.source=T>>=
+trim.func <- function(x, p = .1){
+  n <- nrow(x)  #number of observations
+  trim.number <- round(p*n)  #number to delete (rounded)
+  trimmed.data <- x[-c(1:trim.number),] #delete from top
+  return(trimmed.data)
+}
+@
+\pause
+\bigskip
+<<>>=
+data(macro)
+trimmed.1 <- trim.func(x=macro)
+trimmed.25 <- trim.func(x=macro, p=.25)
+@
+\end{frame}
+
+\begin{frame}
+\frametitle{looking for help}
+Suppose you want help for a certain function or dataset in R (i.e. what are the arguments of the function, what does the function do, etc.).\\ 
+\bigskip
+\pause To look for help with a function called {\tt foo()}, you can type in one of the following:
+\pause
+\begin{itemize}
+\red
+\item {\tt ?foo}
+\item {\tt help("foo")}
+\end{itemize}
+\pause
+\bigskip
+To search for a function by keyword, type in {\tt \red help.search("keyword")}.
+\end{frame}
+
+\begin{frame}
+\frametitle{how to read a help file}
+\pause
+Most help files follow an approximate format:
+\bigskip
+\begin{itemize}
+\item description: briefly describes what the function does
+\item usage: the syntax for the function as well as arguments and its defaults
+\item arguments: more specific details about what goes in the arguments
+\item details: more elaborate description of what the function does
+\item value: quantities that you can extract from the function (the output)
+\item more notes and references
+\item similar functions in R
+\item example code you can run
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{exercises}
+\begin{enumerate}
+\item Write a function that calculates the geometric mean of a vector of numbers:
+\begin{eqnarray*}
+G =  \left( \prod^n_{i=1} X_n \right) ^ {\frac{1}{n}}
+\end{eqnarray*}
+\item Write a function that takes in a matrix, finds the column of the matrix that has the smallest sum, and then produces a list with the mean, median, standard deviation, and the 25th and 75th percentiles of that column.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{solutions}
+\begin{enumerate}
+\red
+\footnotesize
+\item
+<<keep.source=T>>=
+geomean.func <- function(x){  ## x is a vector 
+  G <- prod(x)^(1/length(x))
+  return(G)
+}
+test.vec <- c(1,2,3)
+geomean.func(test.vec)
+@
+\end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]
+\begin{enumerate}
+\red
+\footnotesize
+\item[2.]
+<<keep.source=T>>=
+two.func <- function(x){  ## x is a matrix
+  which.col <- which(colSums(x) == min(colSums(x)))
+  column <- x[,which.col] ## extract column
+  output <- list(mean = mean(column), median = median(column), 
+  sd=sd(column), percentiles=quantile(column, probs=c(.25,.75)))
+  return(output)
+}
+random.numbers <- sample(1:100, 81)
+test.mat <- matrix(random.numbers, nrow = 9, ncol = 9)
+two.func(test.mat)
+@
+\end{enumerate}
+\end{frame}
+
+\section{The Apply Function}
+\begin{frame}
+\frametitle{apply()}
+The {\tt \red apply()} function takes a function and applies it on each row or column of a matrix, dataframe, or array.
+\bigskip
+\pause
+\begin{itemize}
+\item the MARGIN argument gets 1 for row and 2 for column
+\pause
+\item typically, though not necessarily, the function to be applied is a function that takes in vectors
+\pause
+\item any extra arguments to the function being applied can be defined after the FUN argument
+\pause
+\item {\tt \red lapply()}, {\tt \red sapply()}, and {\tt \red tapply()} are functions that do similar things
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+take the median of every row
+\bigskip
+\red
+\footnotesize
+<<>>=
+test.matrix <- matrix(1:9, ncol=3, nrow=3)
+test.matrix
+medians <- apply(test.matrix, MARGIN=1, FUN=median)
+medians
+@
+\end{frame}
+
+\begin{frame}[fragile]
+take the geometric mean of every column
+\bigskip
+\red
+\footnotesize
+<<>>=
+geomean.func <- function(x){  ## x is a vector 
+  G <- prod(x)^(1/length(x))
+  return(G)
+}
+test.matrix <- matrix(11:19, ncol=3, nrow=3)
+apply(test.matrix, MARGIN=2, FUN=geomean.func)
+@
+\end{frame}
+
+\begin{frame}[fragile]
+find the 25th and 75th quantile of every column of {\tt macro}
+\bigskip
+\red
+\footnotesize
+<<keep.source=T>>=
+library(Zelig)
+data(macro)
+## take out the first two columns, which are country and year
+apply(macro[,-c(1,2)], MARGIN=2, FUN=quantile, probs=c(.25,.75))
+summary(macro[,-c(1,2)])
+@
+\end{frame}
+
+\section{Sampling}
+\begin{frame}[fragile]
+\frametitle{sampling}
+Sampling from a vector can be done with the {\tt \red sample()} function.
+\bigskip
+\pause
+\red
+\footnotesize
+<<>>=
+population <- c(1,2,3,4,5)
+samp.w.rep <- sample(population, size=3, replace=T)
+samp.w.rep
+@
+\pause
+\medskip
+<<>>=
+samp.wo.rep <- sample(population, size=3, replace=F)
+samp.wo.rep
+@
+\pause
+\medskip
+<<>>=
+samp.w.probs <- sample(population, size=3, replace=T, prob=c(.8,.05,.05,.05,.05))
+samp.w.probs
+@
+\end{frame}
+
+\section{For Loops}
+\begin{frame}
+\frametitle{for loops}
+Use a {\tt \red for} loop to repeat some code over and over again.
+\pause
+\bigskip
+\begin{itemize}
+\item typically good for things like sampling multiple times
+\pause
+\item very computationally intensive, so use as last resort
+\pause
+\item many things can be done using {\tt \red apply()} instead
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\red
+\footnotesize
+<<>>=
+vector <- c(1,5,8,3,5,2,97,430)
+for (i in vector){
+  print(i)
+}
+@
+\bigskip \pause
+\black \normalsize
+\begin{itemize}
+\item each time runs through everything between {\tt \red \{ \}}
+\item each time, "i" is defined to be an element of the vector (first time "i" is the first element, second time "i" is the second element, etc.)
+\item loop runs as many times as the length of the vector
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+a loop that adds 5 to each of the loop indices and stores the output in a vector
+\bigskip
+\red
+\footnotesize
+<<keep.source=T>>=
+add.vec <- c()
+for (j in 1:10){
+  ## add 5 to j and put in jth slot of the add.vec vector
+  add.vec[j] <- j + 5 
+}
+add.vec
+@
+\end{frame}
+
+\section{Conditional Statements}
+\begin{frame}[fragile]
+\frametitle{conditional statements}
+\pause
+Conditional statements may come in handy when manipulating data:
+\pause
+\bigskip
+\begin{itemize}
+\item {\tt \red if()\{\}} and {\tt \red else\{\}}
+\item {\tt \red ifelse()}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+$$
+f(x) = \left\lbrace \begin{array}{ll} 8x & \mathrm{if} \;
+0 \le x < 0.25 \\
+\frac{8}{3} - \frac{8}{3} x & \mathrm{if} \; 0.25 \le x \le 1 \\
+0 & \mathrm{otherwise} \end{array} \right. 
+$$
+\bigskip
+\pause
+\red
+\footnotesize
+<<>>=
+triangle.func <- function(x) {
+     if (x >= 0 & x < 0.25) {
+         out <- 8 * x
+         }
+     else if (x >= 0.25 & x <= 1) {
+         out <- 8/3 - 8 * x/3
+         }
+     else{ 
+         out <- 0
+         }
+     return(out)
+}
+@
+\end{frame}
+
+\begin{frame}[fragile]
+Create a new variable in {\tt macro} for whether the observation is before or after 1980.
+\bigskip
+\pause
+\red
+\footnotesize
+<<>>=
+macro$pre1980 <- ifelse(macro$year < 1980, 1, 0)
+@
+\bigskip
+\pause
+\black
+\normalsize
+Everything done using {\tt \red ifelse()} can be done using {\tt \red if} and {\tt \red else}, but the code may be less efficient.
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{exercises}
+You will need the {\tt macro} dataset from {\tt Zelig}.
+\bigskip
+\begin{enumerate}
+\item Write a function that takes in a vector and outputs the maximum of the vector minus the minimum of the vector.
+\item Apply the function you wrote above to columns of {\tt macro}, omitting the country and year variables.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]
+\begin{enumerate}
+\item[3.] Omit the country and year variables from {\tt macro}.  Take a sample of 350 observations from the dataset with replacement (hint: sample row numbers).  Take the mean of each column in your sample.  Do this 1000 times and store your results in a $1000 \times 4$ matrix.
+\item[4.] Take a sample of size 200 from {\tt macro\$trade} without replacement.  If the absolute value ({\tt \red abs()}) of the difference between the max and the min of this sample is greater than 3 times the standard deviation of {\tt macro\$trade}, then take the median of the sample.  Otherwise take the mean.  Do this 1000 times and store the results of your 1000 iterations in a vector.
+\item[5.] Create a new variable in {\tt macro} called "rich" where for each observation, the variable takes on a value of 1 if its gdp is greater than the mean gdp and 0 otherwise.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{solutions}
+\begin{enumerate}
+\red
+\footnotesize
+\item 
+<<keep.source=T>>=
+diff.func <- function(x){ ## x is a vector
+  out <- max(x) - min(x)
+  return(out)
+}
+@
+\medskip
+\item 
+<<>>=
+data(macro)
+apply(macro[,-c(1,2)], MARGIN = 2, FUN = diff.func)
+@
+\medskip
+\item 
+<<keep.source=T>>=
+new.macro <- macro[,-c(1,2)]
+results <- matrix(NA, nrow = 1000, ncol = 4) # results matrix
+for (i in 1:1000){
+  row.samp <- sample(c(1:nrow(new.macro)), size = 350, 
+  replace = T) 
+  data.samp <- new.macro[row.samp,]
+  results[i,] <- colMeans(data.samp)
+}
+@
+\end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]
+\begin{enumerate}
+\red
+\footnotesize
+\item [4.]
+<<>>=
+results.vec <- c()
+for (i in 1:1000){
+  samp <- sample(macro$trade, size=200, replace=F)
+  if(abs(max(samp) - min(samp)) > 3*sd(macro$trade)){
+    results.vec[i] <- median(samp)
+  }
+  else{
+    results.vec[i] <- mean(samp)
+  }
+}
+@
+\medskip
+\item [5.]
+<<>>=
+macro$rich <- ifelse(macro$gdp > mean(macro$gdp), 1, 0)
+@
+\end{enumerate}
+
+\end{frame}
+
+\section{Plotting}
+\begin{frame}[fragile]
+\frametitle{plots}
+\begin{itemize}
+\item specialized plots: {\tt \red hist()}, {\tt \red barplot()}, etc.
+\pause
+\item general plot command for lines, points, etc.: {\tt \red plot()}
+\pause
+\item many options using {\tt \red par()} before {\tt \red plot()} 
+\pause
+\item add a legend using {\tt \red legend()}
+\pause
+\item add points with {\tt \red points()}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+scatterplot:
+\red
+\footnotesize
+\medskip
+<<fig=T, include=F, label=plot1>>=
+plot(x=macro$trade, y=macro$gdp, xlab = "Trade", ylab = "GDP", main = "Scatterplot of Trade and GDP")
+@
+\begin{figure}
+\includegraphics[width=2in, height=2in]{rslides-plot1.pdf}
+\end{figure}
+\end{frame}
+
+\begin{frame}[fragile]
+density plot:
+\red
+\footnotesize
+\medskip
+<<fig=T, include=F, label=plot2>>=
+plot(density(macro$trade), main = "Density Plot of Trade")
+@
+\begin{figure}
+\includegraphics[width=2in, height=2in]{rslides-plot2.pdf}
+\end{figure}
+\end{frame}
+
+\begin{frame}[fragile]
+multiple line plots in one (with legend):
+\red
+\footnotesize
+\medskip
+<<fig=T, include=F, label=plot3>>=
+plot(density(macro$gdp), main = "Density Plots")
+lines(density(macro$unem), col = "red", lty = "dashed")
+legend(x="topright", legend=c("GDP", "Unemployment"), lty = c("solid", "dashed"), col=c("black", "red"))
+@
+\begin{figure}
+\includegraphics[width=2in, height=2in]{rslides-plot3.pdf}
+\end{figure}
+\end{frame}
+
+\begin{frame}[fragile]
+add a straight line with {\tt \red abline()}:
+\red
+\footnotesize
+\medskip
+<<fig=T, include=F, label=plot4>>=
+plot(x=macro$trade, y=macro$gdp, xlab = "Trade", ylab = "GDP", main = "Scatterplot of Trade and GDP")
+abline(a=0, b=.1, col="red")
+abline(v=80, col="blue")
+@
+\begin{figure}
+\includegraphics[width=2in, height=2in]{rslides-plot4.pdf}
+\end{figure}
+\end{frame}
+
+\begin{frame}[fragile]
+multiple plots with {\tt \red par()} options
+\red
+\footnotesize
+\medskip
+<<fig=T, include=F, label=plot5>>=
+par(mfrow=c(1,2))
+plot(x=macro$year, y=macro$gdp, main="", xlab="", ylab="")
+plot(x=macro$year, y=macro$unem, main="", xlab="", ylab="")
+@
+\end{frame}
+
+\begin{frame}
+\begin{figure}
+\includegraphics[scale=.5]{rslides-plot5.pdf}
+\end{figure}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{saving plots}
+Two ways of saving plots:
+\pause
+\bigskip
+\begin{itemize}
+\item right-click and save
+\pause
+\item using commands
+\pause
+\begin{itemize}
+\item before the plot command, use {\tt \red pdf()}, {\tt \red png()} etc. with filename
+\item after including everything in plot, type {\tt dev.off()}
+\end{itemize}
+\pause
+\red
+\footnotesize
+<<echo=F>>=
+par(mfrow=c(1,1))
+@
+<<>>=
+pdf("filename.pdf")
+plot(x=macro$trade, y=macro$gdp)
+dev.off()
+@
+\end{itemize}
+\end{frame}
+
+\section{Matrix Algebra}
+\begin{frame}[fragile]
+\frametitle{matrix algebra}
+\pause
+\begin{itemize}
+\item add/subtract matrices with {\tt \red $+/-$}
+\pause
+\item matrix multiply with {\tt \red \%*\%}
+\pause
+\item transpose with {\tt \red t()}
+\pause
+\item invert with {\tt \red solve()}
+\pause
+\item extract diagonal with {\tt \red diag()}
+\pause
+\item determinant with {\tt \red det()}
+\end{itemize}
+\end{frame}
+
+\section{Probability Distributions}
+\begin{frame}[fragile]
+\frametitle{probability distributions}
+For the normal distribution:
+\bigskip
+\begin{itemize}
+\item {\tt \red dnorm()}: density function, gives the height of the density curve
+\pause
+\item {\tt \red pnorm()}: distribution function, gives the area to the left (or right)
+\pause
+\item {\tt \red qnorm()}: quantile function, opposite of {\tt \red pnorm()}
+\pause
+\item {\tt \red rnorm()}: generate random draws from the distribution
+\end{itemize}
+\pause
+\bigskip
+Similar commands for other distributions.
+\end{frame}
+
+\begin{frame}
+<<echo=F,fig=T, include=F, label=normal>>=
+plot(x=seq(-2.5,2.5,by=.1), y=dnorm(seq(-2.5,2.5,by=.1)), ylab="f(x)", xlab="x", type="l", axes=F)
+axis(2)
+axis(1, at=-.5, labels="q=qnorm(p)")
+segments(x0=-.5,y0=0,x1=-.5,y1=dnorm(-.5))
+points(x=-.5,y=dnorm(-.5),pch=19)
+text(x=-1.1, y=.35, labels="d=dnorm(q)")
+text(x=-1, y=.08, labels="p=pnorm(q)")
+box()
+@
+\begin{figure}
+\includegraphics[width=3in, height=3in]{rslides-normal.pdf}
+\end{figure}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{final exercises}
+Write up the following exercises into a \LaTeX\hspace{1pt} document.  Put any code you use into a {\tt verbatim} environment in the document.  All figures and tables should have captions and you should include a very short (1-2 sentence) writeup for everything you report describing what you did.
+\bigskip
+\begin{enumerate}
+\item Load the {\tt PErisk} dataset from the {\tt Zelig} package.
+\item Which country does the 35th observation belongs to?  Use code to identify the country.
+\item Create a new dataset that omits Kenya from the dataset.
+\item Using the new dataset, now extract the {\tt barb2} and {\tt gdpw2} variables.  Find the mean, median, standard deviation, and correlation of these two variables.  Present the results in a nicely formatted table in \LaTeX.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]
+\begin{enumerate}
+\item[5.] Now let $\mathbf{X}$ be a matrix with two columns: the first column is a column of 1s and the second column is the {\tt gdpw2} variable.  Let $\mathbf{y}$ be the {\tt barb2} variable.  Create $\mathbf{X}$ and $\mathbf{y}$ and find $\bm{\hat{\beta}}$, where
+\begin{eqnarray*}
+ \bm{\hat{\beta}} = (\mathbf{X}^T\mathbf{X})^{-1} \mathbf{X}^T\mathbf{y}
+\end{eqnarray*}
+Type out this equation in \LaTeX\hspace{1pt} and also report the values in $\bm{\hat{\beta}}$.  $\bm{\hat{\beta}}$ should be a vector of length 2.  
+\item[6.] Create two plots.  In the first plot, include the density of the {\tt gdpw2} and {\tt barb2} variables.  You should have two curves.  Differentiate the curves by color and/or type.  In the second plot, do a scatterplot with {\tt gdpw2} on the x-axis and {\tt barb2} on the y-axis.  Add a line that has an intercept at the first value of $\bm{\hat{\beta}}$ and a slope of the second value of $\bm{\hat{\beta}}$.  Include an informative legend for both plots.  Put these two plots side-by-side and include them as an image in your document.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}
+\begin{itemize}
+\item[7.] Write a function that takes in any $n \times k$ matrix for $\mathbf{X}$ and any $n \times 1$ vector for $\mathbf{y}$ and calculates $\bm{\hat{\beta}}$.
+\item[8.] Do the following 1000 times with a for loop: Take a sample of 61 observations from the dataset with replacement.  For each sample, calculate $\bm{\hat{\beta}}$, where $\mathbf{X}$ and $\mathbf{y}$ are defined the same as in question 5.  Store your results in a $1000 \times 2$ matrix.
+\item[9.]  Using the apply function, find and report the mean, standard deviation, and 2.5\% and 97.5\% quantiles for the two columns in your matrix.
+\item[10.] For each column, draw 1000 draws from the normal distribution with the means and standard deviations from question 9.  That is, you should draw 1000 draws twice, once with the mean and sd from the first column and once with the mean and sd from the second column.  For each vector of 1000 draws, plot the density of the draws and include a vertical line for the mean of the draws.  You should be doing this twice, once for each set of the 1000 draws.  Include the two plots in your document.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\begin{enumerate}
+\red
+\footnotesize
+\item
+<<>>=
+library(Zelig)
+data(PErisk)
+@
+\item
+<<>>=
+PErisk$country[35]
+@
+\item
+<<>>=
+new.data <- PErisk[PErisk$country != "Kenya",]
+@
+\item
+<<>>=
+variables <- cbind(new.data$barb2, new.data$gdpw2)
+colMeans(variables)
+apply(variables, MARGIN=2, FUN=sd)
+cor(new.data$barb2, new.data$gdpw2)
+@
+\end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]
+\begin{enumerate}
+\red
+\footnotesize
+\item[5.]
+<<>>=
+X <- cbind(1, new.data$gdpw2)
+y <- new.data$barb2
+beta.hat <- solve(t(X) %*% X) %*% t(X) %*% y
+beta.hat
+@
+\SweaveOpts{width=5, height=4} 
+\item[6.]
+<<echo=T, fig=F, include=F, label=plot6>>=
+par(mfrow=c(1,2))
+plot(density(new.data$gdpw2), xlab="", ylab="Density", main="", xlim=c(-20,20))
+lines(density(new.data$barb2), col=2, lty=2)
+legend(x="topleft", legend=c("GDP", "Black Market Premium"), col=c(1,2), lty=1:2, cex=.5)
+plot(x=new.data$gdpw2, y=new.data$barb2, main="", xlab="GDP", ylab="Black Market Premium")
+abline(a=beta.hat[1], b=beta.hat[2], col=2)
+legend(x="topright", legend="Best Fit Line", col=2, lty=1, cex=.5)
+@
+\end{enumerate}
+\end{frame}
+
+\begin{frame}
+\SweaveOpts{width=14, height=8} 
+\begin{center}
+<<echo=F, fig=T, include=T, label=plot6>>=
+par(mfrow=c(1,2))
+plot(density(new.data$gdpw2), xlab="", ylab="Density", main="", xlim=c(-20,20))
+lines(density(new.data$barb2), col=2, lty=2)
+legend(x="topleft", legend=c("GDP", "Black Market Premium"), col=c(1,2), lty=1:2, cex=.7)
+plot(x=new.data$gdpw2, y=new.data$barb2, main="", xlab="GDP", ylab="Black Market Premium")
+abline(a=beta.hat[1], b=beta.hat[2], col=2)
+legend(x="topright", legend="Best Fit Line", col=2, lty=1, cex=.7)
+@
+\end{center}
+\end{frame}
+
+\begin{frame}[fragile]
+\begin{enumerate}
+\red
+\footnotesize
+\item[7.]
+<<>>=
+beta.func <- function(X, y){
+  beta.hat <- solve(t(X) %*% X) %*% t(X) %*% y
+  return(beta.hat)
+}
+@
+\item[8.]
+<<keep.source=T>>=
+results <- matrix(NA, nrow=1000, ncol=2)
+for(i in 1:1000){
+  row.numbers <- sample(1:nrow(new.data), size=61, replace=T)
+  samp.data <- new.data[row.numbers,]  ## sample the data
+  X <- cbind(1, samp.data$gdpw2)
+  y <- samp.data$barb2
+  results[i,] <- beta.func(X=X, y=y)
+}
+@
+\end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]
+\begin{enumerate}
+\red
+\footnotesize
+\item[9.]
+<<>>=
+means <- apply(results, MARGIN=2, FUN=mean)
+means
+sds <- apply(results, MARGIN=2, FUN=sd)
+sds
+quants <- apply(results, MARGIN=2, FUN=quantile, probs=c(.025,.975))
+quants
+@
+\end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]
+\begin{enumerate}
+\red
+\footnotesize
+\item [10.]
+\begin{center}
+\SweaveOpts{width=10, height=5} 
+<<fig=T, include=T, label=plot7>>=
+first.draws <- rnorm(1000, mean=means[1], sd=sds[1])
+second.draws <- rnorm(1000, mean=means[2], sd=sds[2])
+par(mfrow=c(1,2))
+plot(density(first.draws), xlab=expression(beta[1]), main="")
+abline(v=mean(first.draws), col=2)
+plot(density(second.draws), xlab=expression(beta[2]), main="")
+abline(v=mean(second.draws), col=2)
+@
+\end{center}
+\end{enumerate}
+\end{frame}
+\end{document}
+
+
+

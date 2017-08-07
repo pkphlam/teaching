@@ -1,0 +1,670 @@
+\documentclass{beamer}
+
+
+\usetheme{default}
+\usepackage{subfigure}
+\usepackage{Sweave}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{multicol}
+\usepackage{bm}
+\SweaveOpts{eps=F}
+
+\author{Patrick Lam}
+\title{A Brief Review of Probability}
+\date{}
+%\date{September 22, 2008}
+
+\begin{document}
+
+\newcommand{\red}{\textcolor{red}}
+\newcommand{\blue}{\textcolor{blue}}
+\newcommand{\purple}{\textcolor{purple}}
+
+\frame{\titlepage}
+
+\begin{frame}
+\frametitle{Outline}
+\tableofcontents
+\end{frame}
+
+
+
+\section{Expectation, Variance, and Densities}
+
+
+\begin{frame}
+\frametitle{Outline}
+\tableofcontents[currentsection]
+\end{frame}
+
+\begin{frame}
+\frametitle{Expectation}
+\pause
+The expected value of a random variable $X$ is simply the weighted
+average of all possible values of $X$.\\
+\bigskip
+\pause
+Discrete Case:
+\pause
+\begin{eqnarray*}
+E(X) = \sum_i x_i P(X = x_i)
+\end{eqnarray*}
+where $P(X = x)$ is the probability mass function (PMF).\\
+\pause
+\bigskip
+Continuous Case:
+\pause
+\begin{eqnarray*}
+E(X) = \int^{\infty}_{-\infty} x p(x) dx
+\end{eqnarray*}
+where $p(x)$ is the probability density function (PDF).
+\end{frame}
+
+\begin{frame}
+\frametitle{Expectation of a Function of a Random Variable}
+\pause
+Suppose we want to find $E[g(X)]$, where $g(X)$ is any function of
+$X$.  \pause  We can simply weight the values of $g(x)$ by the PDF or
+PMF of $X$:
+\pause
+\begin{eqnarray*}
+E[g(X)] = \sum_i g(x_i) P(X = x_i)
+\end{eqnarray*}
+for discrete random variables \pause and 
+\begin{eqnarray*}
+E[g(X)] = \int_{-\infty}^{\infty} g(x) p(x) dx
+\end{eqnarray*}
+for continuous random variables.  \\
+\bigskip
+\pause
+This is sometimes known as the \textit{Law of the Unconscious
+Statistician} (LOTUS).
+\end{frame}
+
+\begin{frame}
+\frametitle{Variance}
+\pause
+The formula for the variance of a random variable is 
+\begin{eqnarray*}
+\mathrm{Var}(X) = E[(X - E(X))^2]
+\end{eqnarray*}
+\pause
+We can find the variance using LOTUS, \pause or we can simplify the
+formula first.
+\pause
+\begin{eqnarray*}
+\mathrm{Var}(X) &=& E[(X - E(X))^2]\\
+\pause
+&=& E[X^2 - 2 X E(X) + (E(X))^2]\\
+\pause
+&=& E(X^2) - 2 E(X) E[E(X)] + E([E(X)]^2)\\
+\pause
+&=& E(X^2) - 2 [E(X)]^2 + [E(X)]^2\\
+\pause
+&=& \mathbf{E(X^2) - [E(X)]^2}
+\end{eqnarray*}
+\pause
+We can then find the first part with LOTUS.
+\end{frame}
+
+\begin{frame}
+\frametitle{Marginal, Conditional, and Joint Densities}
+\pause
+\begin{eqnarray*}
+p(x) &=& \int p(x,y) dy\\
+\pause
+p(x,y) &=& \int p(x,y,z) dz\\
+\pause
+p(x|y) &=& \frac{p(x,y)}{p(y)}\\
+\pause
+p(x|y,z) &=& \frac{p(x,y,z)}{p(y,z)}\\
+\pause
+p(x,y) &=& p(x | y) p(y)\\
+\pause
+&=& p(y | x) p(x) \\
+\pause
+p(x,y,z) &=& p(x | y,z) p(y|z) p(z)
+\end{eqnarray*}
+\end{frame}
+
+
+
+\section{Important Distributions}
+
+
+\begin{frame}
+\frametitle{Outline}
+\tableofcontents[currentsection]
+\end{frame}
+
+\subsection{Discrete Distributions}
+
+
+\begin{frame}
+\frametitle{Outline}
+\tableofcontents[currentsubsection]
+\end{frame}
+
+\begin{frame}
+\frametitle{The Bernoulli Distribution}
+\begin{multicols}{2}
+\pause
+$Y \sim$ Bernoulli$(\pi)$\\
+\bigskip
+\pause
+$y = 0,1$\\
+\bigskip
+\pause
+probability of success: $\pi \in [0,1]$\\
+\bigskip
+\pause
+$p(y|\pi) = \pi^y (1 - \pi)^{(1-y)}$\\
+\bigskip
+\bigskip
+\pause
+$E(Y) = \pi$\\
+\bigskip
+\pause
+Var$(Y) = \pi (1 - \pi)$
+\pause
+
+<<echo = F, results = hide, fig = T, include = F, label = bernoulli>>=
+x.bernoulli <- c(0,1)
+y.bernoulli.1 <- dbinom(x.bernoulli,1,.3)
+y.bernoulli.2 <- dbinom(x.bernoulli,1,.5)
+y.bernoulli.3 <- dbinom(x.bernoulli,1,.7)
+plot(x = x.bernoulli, y = y.bernoulli.1, xlim = c(-.5,1.5), ylim = c(0,1), xlab = "y", ylab = expression(paste("p(y |", " ", pi, ")")), axes = F, pch = 19)
+title(main = "Bernoulli Distribution")
+axis(1, at = c(0,1))
+axis(2)
+points(x = x.bernoulli, y = y.bernoulli.2, pch = 19, col = "red")
+points(x = x.bernoulli, y = y.bernoulli.3, pch = 19, col = "blue")
+box()
+legend(x = "topright", legend = c("Bernoulli(.3)", "Bernoulli(.5)", "Bernoulli(.7)"), pch = c(19,19,19), col = c("black", "red", "blue"), )
+@
+
+\begin{figure}[!htp]
+\begin{center}
+\includegraphics[width=2in, height=2in]{probability-bernoulli.pdf}
+\end{center}
+\end{figure}
+\end{multicols}
+\end{frame}
+
+
+
+\begin{frame}
+\frametitle{The Binomial Distribution}
+\begin{multicols}{2}
+\pause
+$Y \sim$ Binomial$(n, \pi)$\\
+\bigskip
+\pause
+$y = 0,1,\dots,n$\\
+\bigskip
+\pause
+number of trials: $n \in \{1,2,\dots \}$\\
+\pause
+probability of success: $\pi \in [0,1]$\\
+\bigskip
+\pause
+$p(y|\pi) = \binom{n}{y} \pi^y (1 - \pi)^{(n-y)}$\\
+\bigskip
+\bigskip
+\pause
+$E(Y) = n \pi$\\
+\bigskip
+\pause
+Var$(Y) = n \pi (1 - \pi)$
+\pause
+
+<<echo = F, results = hide, fig = T, include = F, label = binomial>>=
+x.binomial <- c(0:20)
+y.binomial.1 <- dbinom(x.binomial,20,.3)
+y.binomial.2 <- dbinom(x.binomial,20,.5)
+y.binomial.3 <- dbinom(x.binomial,20,.9)
+plot(x = x.binomial, y = y.binomial.1, xlim = c(0,20), ylim = c(0,.5),
+     xlab = "y", ylab = expression(paste("p(y |", " ", "n", ",", " ", pi, ")")), pch = 19)
+title(main = "Binomial Distribution")
+points(x = x.binomial, y = y.binomial.2, pch = 19, col = "red")
+points(x = x.binomial, y = y.binomial.3, pch = 19, col = "blue")
+box()
+legend(x = "topright", legend = c("Binomial(20,.3)", "Binomial(20,.5)", "Binomial(20,.9)"), pch = c(19,19,19), col = c("black", "red", "blue"), )
+@
+
+\begin{figure}[!htp]
+\begin{center}
+\includegraphics[width=2in, height=2in]{probability-binomial.pdf}
+\end{center}
+\end{figure}
+\end{multicols}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{The Multinomial Distribution}
+\pause
+$Y \sim$ Multinomial$(n,\pi_1, \dots, \pi_k)$\\
+\bigskip
+\pause
+$y_j = 0,1,\dots,n; \; \; \sum_{j=1}^k y_j = n$\\
+\bigskip
+\pause
+number of trials: $n \in \{1,2,\dots \}$\\
+\pause
+probability of success for $j$: $\pi_j \in [0,1]; \; \; \sum_{j=1}^k
+\pi_j = 1$\\
+\bigskip
+\pause
+$p(\mathbf{y}|n,\bm{\pi}) = \frac{n!}{y_1! y_2! \dots
+y_k!}\pi_1^{y_1}\pi_2^{y_2} \dots \pi_k ^ {y_k}$\\
+\bigskip
+\bigskip
+\pause
+$E(Y_j) = n\pi_j$\\
+\bigskip
+\pause
+Var$(Y_j) = n \pi_j (1 - \pi_j)$\\
+\bigskip
+\pause
+Cov$(Y_i, Y_j) = -n \pi_i \pi_j$
+
+
+\end{frame}
+
+
+
+\begin{frame}
+\frametitle{The Poisson Distribution}
+\begin{multicols}{2}
+\pause
+$Y \sim$ Poisson$(\lambda)$\\
+\bigskip
+\pause
+$y = 0,1,\dots$\\
+\bigskip
+\pause
+expected number of occurrences: $\lambda > 0$\\
+\bigskip
+\pause
+$p(y|\lambda) = \frac{e^{-\lambda} \lambda^y}{y!}$\\
+\bigskip
+\bigskip
+\pause
+$E(Y) = \lambda$\\
+\bigskip
+\pause
+Var$(Y) = \lambda$
+\pause
+
+<<echo = F, results = hide, fig = T, include = F, label = poisson>>=
+x.poisson <- c(0:50)
+y.poisson.1 <- dpois(x.poisson,2)
+y.poisson.2 <- dpois(x.poisson,10)
+y.poisson.3 <- dpois(x.poisson,20)
+plot(x = x.poisson, y = y.poisson.1, xlim = c(0,50), ylim = c(0,.5),
+     xlab = "y", ylab = expression(paste("p(y |", " ", lambda, ")")), pch = 19)
+title(main = "Poisson Distribution")
+points(x = x.poisson, y = y.poisson.2, pch = 19, col = "red")
+points(x = x.poisson, y = y.poisson.3, pch = 19, col = "blue")
+box()
+legend(x = "topright", legend = c("Poisson(2)", "Poisson(10)", "Poisson(20)"), pch = c(19,19,19), col = c("black", "red", "blue"), )
+@
+
+\begin{figure}[!htp]
+\begin{center}
+\includegraphics[width=2in, height=2in]{probability-poisson.pdf}
+\end{center}
+\end{figure}
+\end{multicols}
+\end{frame}
+
+\begin{frame}
+\frametitle{The Geometric Distribution}
+\pause
+How many Bernoulli trials until success?
+\begin{multicols}{2}
+\pause
+$Y \sim$ Geometric$(\pi)$\\
+\bigskip
+\pause
+$y = 1,2,3,\dots$\\
+\bigskip
+\pause
+probability of success: $\pi \in [0,1]$\\
+\bigskip
+\pause
+$p(y|\pi) = (1 - \pi)^{(y-1)} \pi$\\
+\bigskip
+\bigskip
+\pause
+$E(Y) = \frac{1}{\pi}$\\
+\bigskip
+\pause
+Var$(Y) = \frac{1 - \pi}{\pi^2}$
+\pause
+
+<<echo = F, results = hide, fig = T, include = F, label = geometric>>=
+x.geometric <- c(1:10)
+y.geometric.1 <- dgeom(x.geometric,.3)
+y.geometric.2 <- dgeom(x.geometric,.5)
+y.geometric.3 <- dgeom(x.geometric,.7)
+plot(x = x.geometric, y = y.geometric.1, xlim = c(1,10), ylim = c(0,.5), xlab = "y", ylab = expression(paste("p(y |", " ", pi, ")")), pch = 19)
+title(main = "Geometric Distribution")
+points(x = x.geometric, y = y.geometric.2, pch = 19, col = "red")
+points(x = x.geometric, y = y.geometric.3, pch = 19, col = "blue")
+box()
+legend(x = "topright", legend = c("Geometric(.3)", "Geometric(.5)", "Geometric(.7)"), pch = c(19,19,19), col = c("black", "red", "blue"))
+@
+
+\begin{figure}[!htp]
+\begin{center}
+\includegraphics[width=2in, height=2in]{probability-geometric.pdf}
+\end{center}
+\end{figure}
+\end{multicols}
+\end{frame}
+
+\subsection{Continuous Distributions}
+
+
+\begin{frame}
+\frametitle{Outline}
+\tableofcontents[currentsubsection]
+\end{frame}
+
+\begin{frame}
+\frametitle{The Univariate Normal Distribution}
+\begin{multicols}{2}
+\pause
+$Y \sim$ Normal$(\mu, \sigma^2)$\\
+\bigskip
+\pause
+$y \in \mathbb{R}$\\
+\bigskip
+\pause
+mean: $\mu \in \mathbb{R}$\\
+\pause
+variance: $\sigma^2 > 0$\\
+\bigskip
+\pause
+$p(y|\mu, \sigma^2) = \frac{\exp \left( {-\frac{(y - \mu)^2}{2\sigma^2} } \right)}{\sigma \sqrt{2 \pi}}$\\
+\bigskip
+\bigskip
+\pause
+$E(Y) = \mu$\\
+\bigskip
+\pause
+Var$(Y) = \sigma^2$
+\pause
+
+<<echo = F, results = hide, fig = T, include = F, label = normal>>=
+x.normal <- seq(-5,5,.1)
+y.normal.1 <- dnorm(x.normal,0,1)
+y.normal.2 <- dnorm(x.normal,2,1)
+y.normal.3 <- dnorm(x.normal,0,.5)
+plot(x = x.normal, y = y.normal.1, xlim = c(-5,5), ylim =  c(0,2), 
+     xlab = "y", ylab = expression(paste("p(y |", " ", mu, ",", " ", sigma^2, ")")),
+     type = "l")
+title(main = "Normal Distribution")
+lines(x = x.normal, y = y.normal.2, col = "red")
+lines(x = x.normal, y = y.normal.3, col = "blue")
+box()
+legend(x = "topright", legend = c("Normal(0,1)", "Normal(2,1)", "Normal(0,.25)"), lty = c(1,1,1), col = c("black", "red", "blue"), )
+@
+
+\begin{figure}[!htp]
+\begin{center}
+\includegraphics[width=2in, height=2in]{probability-normal.pdf}
+\end{center}
+\end{figure}
+\end{multicols}
+\end{frame}
+
+
+
+\begin{frame}
+\frametitle{The Multivariate Normal Distribution}
+\pause
+$Y \sim \mathcal{N}(\bm{\mu},\bm{\Sigma})$\\
+\bigskip
+\pause
+$\mathbf{y} \in \mathbb{R}^k$\\
+\bigskip
+\pause
+mean vector: $\bm{\mu} \in \mathbb{R}^k$\\
+\pause
+variance-covariance matrix: $\bm{\Sigma}$ positive definite $k \times
+k$ matrix\\
+\bigskip
+\pause
+$p(\mathbf{y}|\bm{\mu},\bm{\pi}) = (2\pi)^{-k/2} | \bm{\Sigma}
+|^{-1/2} \exp{\left( -\frac{1}{2} (\bm{y} - \bm{\mu})'
+\bm{\Sigma^{-1}} (\bm{y} - \bm{\mu}) \right)}$\\
+\bigskip
+\bigskip
+\pause
+$E(Y) = \bm{\mu}$\\
+\bigskip
+\pause
+Var$(Y) = \bm{\Sigma}$\\
+\end{frame}
+
+
+\begin{frame}
+\frametitle{The Uniform Distribution}
+\pause
+$Y \sim$ Uniform$(\alpha, \beta)$\\
+\bigskip
+\pause
+$y \in [\alpha, \beta]$\\
+\bigskip
+\pause
+Interval: $[\alpha, \beta]; \; \; \beta > \alpha$\\
+\bigskip
+\pause
+$p(y| \alpha, \beta) = \frac{1}{\beta - \alpha}$\\
+\bigskip
+\bigskip
+\pause
+$E(Y) = \frac{\alpha + \beta}{2}$\\
+\bigskip
+\pause
+Var$(Y) = \frac{(\beta - \alpha)^2}{12}$
+
+\end{frame}
+
+
+
+\begin{frame}
+\frametitle{The Beta Distribution}
+\begin{multicols}{2}
+\pause
+$Y \sim$ Beta$(\alpha, \beta)$\\
+\bigskip
+\pause
+$y \in [0,1]$\\
+\bigskip
+\pause
+shape parameters: $\alpha > 0; \; \; \beta > 0$\\
+\bigskip
+\pause
+$p(y| \alpha, \beta) = \frac{\Gamma (\alpha + \beta)}{\Gamma (\alpha)
+\Gamma (\beta)} y^{(\alpha - 1)} (1 - y)^{(\beta-1)}$\\
+\bigskip
+\bigskip
+\pause
+$E(Y) = \frac{\alpha}{\alpha + \beta}$\\
+\bigskip
+\pause
+Var$(Y) = \frac{\alpha \beta}{(\alpha + \beta)^2 )\alpha + \beta + 1)}$
+
+<<echo = F, results = hide, fig = T, include = F, label = beta>>=
+x.beta <- seq(0,1,.01)
+y.beta.1 <- dbeta(x.beta,1,1)
+y.beta.2 <- dbeta(x.beta,.5,.5)
+y.beta.3 <- dbeta(x.beta,5,.5)
+y.beta.4 <- dbeta(x.beta,5,5)
+y.beta.5 <- dbeta(x.beta,5,8)
+plot(x = x.beta, y = y.beta.1, xlim = c(0,1), ylim =  c(0,7), 
+     xlab = "y", ylab = expression(paste("p(y |", " ", alpha, ",", " ", beta, ")")),
+     type = "l")
+title(main = "Beta Distribution")
+lines(x = x.beta, y = y.beta.2, col = "red")
+lines(x = x.beta, y = y.beta.3, col = "blue")
+lines(x = x.beta, y = y.beta.4, col = "purple")
+lines(x = x.beta, y = y.beta.5, col = "green")
+box()
+legend(x = "topright", legend = c("Beta(1,1)", "Beta(.5,.5)",
+"Beta(5,.5)", "Beta(5,5)", "Beta(5,8)"), lty = c(1,1,1,1,1), col =
+c("black", "red", "blue", "purple", "green"), )
+@
+
+\begin{figure}[!htp]
+\begin{center}
+\includegraphics[width=2in, height=2in]{probability-beta.pdf}
+\end{center}
+\end{figure}
+\end{multicols}
+
+\end{frame}
+
+
+\begin{frame}
+\frametitle{The Gamma Distribution}
+\pause
+\begin{multicols}{2}
+$Y \sim$ Gamma$(\alpha, \beta)$\\
+\bigskip
+\pause
+$y > 0$\\
+\bigskip
+\pause
+shape parameter: $\alpha > 0$\\
+\pause
+inverse scale parameter: $\beta > 0$ \\
+\bigskip
+\pause
+$p(y| \alpha, \beta) = \frac{\beta^{\alpha}}{\Gamma (\alpha)}
+y^{(\alpha - 1)} \exp{(-\beta y)}$\\
+\bigskip
+\bigskip
+\pause
+$E(Y) = \frac{\alpha}{\beta}$\\
+\bigskip
+\pause
+Var$(Y) = \frac{\alpha}{\beta^2}$
+
+<<echo = F, results = hide, fig = T, include = F, label = gamma>>=
+x.gamma <- seq(0,10,.1)
+y.gamma.1 <- dgamma(x.gamma,shape=1,rate=1)
+y.gamma.2 <- dgamma(x.gamma,shape=5,rate=5)
+y.gamma.3 <- dgamma(x.gamma,shape=10,rate=5)
+plot(x = x.gamma, y = y.gamma.1, xlim = c(0,10), ylim =  c(0,2), 
+     xlab = "y", ylab = expression(paste("p(y |", " ", alpha, ",", " ", beta, ")")),
+     type = "l")
+title(main = "Gamma Distribution")
+lines(x = x.gamma, y = y.gamma.2, col = "red")
+lines(x = x.gamma, y = y.gamma.3, col = "blue")
+box()
+legend(x = "topright", legend = c("Gamma(1,1)", "Gamma(5,5)",
+"Gamma(10,5)"), lty = c(1,1,1), col =
+c("black", "red", "blue"), )
+@
+
+\begin{figure}[!htp]
+\begin{center}
+\includegraphics[width=2in, height=2in]{probability-gamma.pdf}
+\end{center}
+\end{figure}
+\end{multicols}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{The Inverse Gamma Distribution}
+\pause
+Distribution of the Inverse of a Gamma Distribution: \pause If $X \sim$
+Gamma($\alpha, \beta$), then $\frac{1}{X} \sim$ Invgamma($\alpha, \beta$).
+\begin{multicols}{2}
+\pause
+$Y \sim$ Invgamma$(\alpha, \beta)$\\
+\bigskip
+\pause
+$y > 0$\\
+\bigskip
+\pause
+shape parameter: $\alpha > 0$\\
+\pause
+scale parameter: $\beta > 0$\\
+\bigskip
+\pause
+$p(y|\alpha, \beta) = \frac{\beta^\alpha}{\Gamma(\alpha)}
+y^{-(\alpha+1)} e^{-\frac{\beta}{y}}$\\
+\bigskip
+\bigskip
+\pause
+$E(Y) = \frac{\beta}{\alpha-1}$ for $\alpha > 1$\\
+\bigskip
+\pause
+Var$(Y) = \frac{\beta^2}{(\alpha-1)^2 (\alpha-2)}$ for $\alpha > 2$
+\pause
+
+<<echo = F, results = hide, fig = T, include = F, label = invgamma>>=
+library(MCMCpack)
+x.invgamma <- seq(0,3,.01)
+y.invgamma.1 <- dinvgamma(x.invgamma,1,1)
+y.invgamma.2 <- dinvgamma(x.invgamma,2,1)
+y.invgamma.3 <- dinvgamma(x.invgamma,3,1)
+y.invgamma.4 <- dinvgamma(x.invgamma,3,.5)
+plot(x = x.invgamma, y = y.invgamma.1, xlim = c(0,3), ylim = c(0,5), xlab = "y", ylab
+     = expression(paste("p(y |", " ", alpha, ",", beta, ")")), type = "l")
+title(main = "Inverse Gamma Distribution")
+lines(x = x.invgamma, y = y.invgamma.2, col = "red")
+lines(x = x.invgamma, y = y.invgamma.3, col = "blue")
+lines(x = x.invgamma, y = y.invgamma.4, col = "green")
+legend(x = "topright", legend = c("Invgamma(1,1)", "Invgamma(2,1)",
+                         "Invgamma(3,1)", "Invgamma(3,.5)"), lty =
+       c(1,1,1,1), col = c("black", "red", "blue", "green"))
+@
+
+\begin{figure}[!htp]
+\begin{center}
+\includegraphics[width=2in, height=2in]{probability-invgamma.pdf}
+\end{center}
+\end{figure}
+\end{multicols}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{The Dirichlet Distribution}
+\pause
+$Y \sim$ Dirichlet$(\alpha_1,\dots, \alpha_k)$\\
+\bigskip
+\pause
+$y_j \in [0,1]; \; \; \sum_{j=1}^{k} y_j = 1$\\
+\bigskip
+\pause
+$\alpha$ parameters: $\alpha_j > 0; \; \; \sum_{j=1}^k \alpha_j \equiv
+\alpha_0$\\
+\bigskip
+\pause
+$p(\mathbf{y}| \bm{\alpha}) = \frac{\Gamma (\alpha_1 + \dots +
+\alpha_k)}{\Gamma (\alpha_1) \dots \Gamma (\alpha_k)} y_1^{\alpha_1 -
+1} \dots y_k^{\alpha_k - 1}$\\
+\bigskip
+\bigskip
+\pause
+$E(Y_j) = \frac{\alpha_j}{\alpha_0}$\\
+\bigskip
+\pause
+Var$(Y_j) = \frac{\alpha_j (\alpha_0 - \alpha_j)}{\alpha^2_0 (\alpha_0
++ 1)}$\\
+\bigskip
+\pause
+Cov$(Y_i, Y_j) = -\frac{\alpha_i \alpha_j}{\alpha^2_0 (\alpha_0 + 1)}$
+\end{frame}
+
+\end{document}

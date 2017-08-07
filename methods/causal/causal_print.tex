@@ -1,0 +1,476 @@
+\documentclass[handout]{beamer}
+
+
+\usetheme{default}
+\usepackage{subfigure}
+\usepackage{amsmath}
+\usepackage{Sweave}
+\usepackage{graphicx}
+%\usepackage{color}
+\usepackage{multicol}
+\usepackage{bm}
+\usepackage[all]{xy}
+
+
+\author{Patrick Lam}
+\title{Causal Inference}
+\date{}
+%\date{April 2, 2009}
+
+\begin{document}
+
+\newcommand{\red}{\textcolor{red}}
+\newcommand{\blue}{\textcolor{blue}}
+\newcommand{\purple}{\textcolor{purple}}
+
+\frame{\titlepage}
+
+\begin{frame}
+\frametitle{Reference on History of Causal Inference}
+Holland, Paul W. 1986.  ``Statistics and Causal Inference.''  {\it
+Journal of the American Statistical Association} 81(396): 945-960. 
+\end{frame}
+
+\begin{frame}
+\frametitle{What is a Causal Effect?}
+\pause
+\begin{eqnarray*}
+Y_i(1) - Y_i(0)
+\end{eqnarray*}
+\pause
+where $Y_i(1) = Y_i(T_i = 1)$ for some treatment variable $T$. \\
+\bigskip
+\bigskip
+\pause
+$Y_i(1)$ and $Y_i(0)$ are {\it potential outcomes} \pause in that they
+represent the outcomes for individual $i$ had they received the
+treatment or control respectively. \\
+\bigskip
+\pause
+The {\bf fundamental problem of causal inference} is that only one of
+$Y_i(1)$ and $Y_i(0)$ is observed, so we can never find the true
+causal effect.\\
+\pause
+\bigskip
+The approach we will discuss is known as the {\it Rubin Causal Model}.
+\end{frame}
+
+\begin{frame}
+\frametitle{}
+Instead of the individual treatment effect, we might be interested in
+the {\bf average treatment effect (ATE)}: 
+\pause
+\begin{eqnarray*}
+E[Y(1) - Y(0)] = E[Y(1)] - E[Y(0)]
+\end{eqnarray*}
+\pause
+We cannot find the ATE because of the unobserved potential outcomes. \\
+\pause
+\bigskip
+We might also be interested in the {\bf average treatment effect on
+the treated (ATT)}:
+\pause
+\begin{eqnarray*}
+E[Y(1|T=1) - \red{Y(0 | T=1)}] = E[Y_t(1) - \red{Y_t(0)}]
+\end{eqnarray*}
+\pause
+We cannot find the ATT because of \red{unobserved} potential outcomes.
+\end{frame}
+
+\begin{frame}
+\frametitle{Causal Inference as Missing Data Problem}
+\pause
+\begin{table}[!htp]
+\begin{center}
+\begin{tabular}{c|ccc|c}
+\hline
+$i$ & $T_i$ & $Y_i(0)$ & $Y_i(1)$ & $Y_i(1) - Y_i(0)$ \\
+\hline
+1 & 0 & 3 & \red{5} & \red{2}\\
+2 & 1 & \red{2} & 5 & \red{3} \\
+3 & 1 & \red{5} & 4 & \red{-1}\\
+4 & 0 & 2 & \red{7} & \red{5}\\
+5 & 1 & \red{1} & 2 & \red{1}\\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+\pause
+\bigskip
+Some potential outcomes are \red{unobserved}, as are the ATE and ATT. \\
+\pause
+\bigskip
+\red{ATE $=$ \pause 2} \\
+\pause
+\bigskip
+\red{ATT $=$ \pause 1}
+\end{frame}
+
+\begin{frame}
+\frametitle{Estimating ATE}
+\pause
+We can estimate the ATE in the following way:
+\pause
+\begin{eqnarray*}
+\hat{\mathrm{ATE}} &=& E[Y_t(1) - Y_c(0)] \\
+\pause
+&=& E[Y_t(1)] - E[Y_c(0)] \\ 
+\end{eqnarray*}
+\pause
+Both quantities are observed. \\
+\pause
+\bigskip
+We basically find the average $Y$ for observations that received
+treatment and average $Y$ for observations that received control. \\
+\pause
+\bigskip
+What assumptions do we need for this estimate to be unbiased?
+\pause
+\begin{itemize}
+\item SUTVA
+\pause
+\item unconfoundedness/ignorability
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Stable Unit Treatment Value Assumption}
+\pause
+The {\bf stable unit treatment value assumption (SUTVA)} assumes that
+\pause
+\begin{itemize}
+\item the treatment status of any unit does not affect the potential
+outcomes of the other units (non-interference)
+\pause
+\item the treatments for all units are comparable (no variation in treatment) 
+\end{itemize}
+\bigskip
+\pause
+Violations: 
+\pause
+\begin{itemize}
+\item Job training for too many people may flood the market with
+qualified job applicants (interference) 
+\pause
+\item Some patients get extra-strength aspirin (variation in treatment)
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Ignorability/Unconfoundedness}
+Unconfoundedness (strong ignorability): 
+\begin{eqnarray*}
+(Y(1), Y(0)) \bot T
+\end{eqnarray*}
+\pause
+\bigskip
+Treatment assignment is independent of the outcomes ($Y$). \\
+\pause
+\bigskip
+Ignorability and Unconfoundedness are often used interchangeably. 
+Technically, unconfoundedness is a stronger assumption.  Most people
+just say ignorability.\\
+\bigskip
+\pause
+Violations:
+\pause
+\begin{itemize}
+\item Omitted Variable Bias
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Classical Randomized Experiment}
+\pause
+The gold standard of scientific research.\\
+\pause
+\bigskip
+\begin{enumerate}
+\item Randomly sample units from population.\\
+\pause
+\item Randomly assign treatment and control to the units.\\
+\pause
+\item Estimate ATE.
+\end{enumerate}
+\pause
+\bigskip
+SUTVA: can theoretically control for treatment variation and
+non-interference \\
+\pause
+\bigskip
+Ignorability: controlled for by random treatment assignment
+\end{frame}
+
+\begin{frame}
+Possible problems:
+\pause
+\bigskip
+\begin{itemize}
+\item Compliance to treatment assignment:
+\pause
+\begin{itemize}
+\item Never-taker: Unit never takes treatment
+\pause
+\item Always-taker: Unit always takes treatment
+\pause
+\item Complier: Unit takes treatment when assigned and control when
+not assigned
+\pause
+\item Defier: Unit takes treatment when not assigned and control when assigned
+\end{itemize}
+\pause
+\bigskip
+\item Unlucky random treatment assignment violates ignorability
+\pause
+\begin{itemize}
+\item Problem goes away as sample size gets large.
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Observational Data}
+\pause
+We have a dataset where we only observe after the experiment occurred
+and we have no control over treatment assignment. \\
+\pause
+\bigskip
+This is the case with most of the sciences.
+\pause
+\bigskip
+\begin{enumerate}
+\item Gather dataset.
+\pause
+\item Estimate ATE or ATT with a model.
+\end{enumerate}
+\pause
+\bigskip
+SUTVA: assumed (a problematic assumption most of the time) \\
+\pause
+\bigskip
+Ignorability: include covariates to get
+conditional ignorability
+\pause
+\begin{eqnarray*}
+(Y(1), Y(0)) \bot T | X
+\end{eqnarray*}
+\pause
+Treatment assignment is independent of the outcomes ($Y$) given
+covariates $X$.
+\end{frame}
+
+\begin{frame}
+Problems:
+\pause
+\bigskip
+\begin{itemize}
+\item SUTVA assumption
+\pause
+\bigskip
+\item Omitted variable bias
+\pause
+\begin{itemize}
+\item Don't include all the variables that makes treatment assignment independent of $Y$.
+\end{itemize}
+\pause
+\bigskip
+\item Model Dependence
+\pause
+\begin{itemize}
+\item We try to alleviate the curse of dimensionality and problem of
+continuous covariates by specifying a model.
+\pause
+\item Estimates of ATE or ATT may differ depending on the model you specify.
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Matching to Ameliorate Model Dependence}
+\pause
+If we had pairs of observations that had the exact same covariate
+values (perfect {\bf balance}) and differed only on treatment assignment, then we would have
+perfect conditional ignorability (assuming no omitted variable
+bias).\\
+\pause
+\bigskip
+Then we will get the same results regardless of the model.\\
+\pause
+\bigskip
+Matching is a method of trying to achieve better balance on covariates
+and reduce model dependence. \\
+\pause
+\bigskip
+Goal: {\bf BALANCE} on covariates
+\end{frame}
+
+\begin{frame}
+\frametitle{Matching on Propensity Scores}
+\pause
+Suppose each observation has some true probability of receiving the
+treatment.
+\pause
+\begin{itemize}
+\item A doctor examines a patient and has a probability of
+giving the patient a drug, depending on the patient's age, health, etc.
+\end{itemize}
+\bigskip
+\pause
+The probability of receiving the treatment is the {\bf propensity
+score}. \\
+\pause
+\bigskip
+We don't know the true propensity score but we can estimate it for
+each observation with a regression of $T$ on $X$ \pause (assuming we have the
+right set of $X$ that went into the decision for assigning
+treatment).\\
+\pause
+\bigskip
+Then we match an observation that received treatment with an
+observation with a similar propensity score that received control.\\
+\pause
+\bigskip
+Since we don't have the true propensity scores, we need to check for
+balance on our covariates at the end.
+\end{frame}
+
+\begin{frame}
+\frametitle{Other Matching Algorithms}
+\pause
+Matching on propensity scores is only one way of matching. \\
+\pause
+\bigskip
+Other ways include:
+\pause
+\begin{itemize}
+\item Matching on Mahalanobis distances
+\pause
+\item Genetic Matching
+\pause
+\item Coarsened Exact Matching (CEM)
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Instrumental Variables}
+\pause
+Goal: Estimate Causal Effects\\
+\bigskip
+\pause
+Problem in Observational Data: Non-ignorability of treatment
+assignment \pause (and SUTVA) \\
+\pause
+\bigskip
+Solution so far: Include covariates and match \\
+\pause
+\bigskip
+Another solution: {\bf Instrumental Variables} \\
+\pause
+\bigskip
+The idea: Find an instrument $Z$ that is randomly assigned (or
+assignment is ignorable) and that affects $Y$ only through $T$. \\
+\pause
+\bigskip
+Example: $Y$ = post-Vietnam War civilian mortality; \pause $T$ = serving in the
+military during Vietnam War; \pause $Z$ = draft lottery
+\end{frame}
+
+\begin{frame}
+\frametitle{The Potential Outcomes Approach}
+\pause
+Assumptions:
+\pause
+\bigskip
+\begin{enumerate}
+\item SUTVA:
+\pause 
+$Z_i$ does not affect $T_j$ and $Y_j$ and $T_i$ does not
+affect $Y_j$ for all $i \neq j$ (non-interference) and there is no
+variation in the treatment or the instrument.
+\pause
+\small
+\begin{figure}[!htp]
+\caption{SUTVA Assumption implies absence of dotted arrows.}
+\centerline{
+\xymatrix{
+Z_i \ar[r] \ar@{.>}[rdd] \ar@{.>}[rrdd] & T_i \ar[r] \ar@{.>}[rdd] & Y_i\\
+& & \\
+Z_j \ar[r] & T_j \ar[r] & Y_j\\
+}
+}
+\end{figure}
+\pause
+\bigskip
+\tiny
+{\it Example: The veteran status of any man at risk of being drafted
+in the lottery was not affected by the draft status of others at risk
+of being drafted, and, similarly, that the civilian mortality of any
+such man was not affected by the draft status of others.}
+\normalsize
+\end{enumerate}
+\end{frame}
+
+\begin{frame}
+\begin{itemize}
+\item [2.] Random (Ignorable) Assignment of the Instrument $Z$ \\
+\pause
+\tiny
+{\it Example: Assignment of draft status was random.}
+\normalsize
+\bigskip
+\pause
+\item [3.] Exclusion Restriction: \pause Any effect of $Z$ on $Y$ must
+be via an effect of $Z$ on $T$.
+\pause
+\small
+\begin{figure}[!htp]
+\caption{Exclusion assumption implies absence of dotted arrow.}
+\centerline{
+\xymatrix{
+Z_i \ar[r] \ar@(dr,dl) @{.>}[rr]& D_i \ar[r] & Y_i\\
+}
+}
+\end{figure}
+\pause
+\tiny
+{\it Example: Civilian mortality risk was not affected by draft status once
+veteran status is taken into account.}
+\normalsize
+\bigskip
+\item [4.] Nonzero Average Causal Effect of $Z$ on $T$.\\
+\pause
+\tiny
+{\it Example:  Having a low lottery number increases the average probability of service.}
+\normalsize
+\bigskip
+\pause
+\item [5.] Monotonicity: \pause No Defiers\\
+\pause
+\tiny
+{\it Example: There is no one who would have served if given a high lottery number, but not if given a low lottery number.}
+\normalsize
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+If all the assumptions hold, then the {\bf Local Average Treatment
+Effect (LATE)} of $T$ on $Y$ is 
+\begin{eqnarray*}
+\mathrm{LATE} = \frac{\mathrm{Effect \; of \; Z \; on \;
+Y}}{\mathrm{Effect \; of \; Z \; on \; T}} 
+\end{eqnarray*}
+\pause
+It is only a local average treatment effect because it's the effect of
+$T$ on $Y$ for the subpopulation of compliers, and not the whole population.
+\end{frame}
+
+\begin{frame}
+Angrist, Joshua D., Guido W. Imbens and Donald B. Rubin. 1996. ``Identification of Causal Effects
+Using Instrumental Variables.'' {\it Journal of the American
+Statistical Association} 91(434):444-455. \\
+\bigskip
+Describes instrumental variables in more detail and compares it to the
+econometric treatment.
+\end{frame}
+
+\end{document}

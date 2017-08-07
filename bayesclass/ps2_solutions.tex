@@ -1,0 +1,51 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[latin1]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{fullpage}
+\usepackage{color}
+\author{Patrick Lam}
+
+\parindent=0in
+\newcommand{\red}{\color{red}}
+\newcommand{\black}{\color{black}}
+\begin{document}
+
+\begin{center}
+\begin{Large}Week 2 Problems\end{Large}
+\end{center}
+\bigskip
+\begin{enumerate}
+
+
+\item Suppose you have $n$ independent observations that follow a Poisson($\lambda$), so
+\begin{eqnarray*}
+Y_i \sim \mathrm{Poisson}(\lambda) \; \mathrm{for} \; i = 1,2,\dots,n
+\end{eqnarray*}
+Using a Gamma($\alpha, \beta$) prior on $\lambda$, find the posterior distribution for $\lambda$.  Does this distribution have a name?
+
+\begin{itemize}
+\item Poisson PMF: $p(y) = \frac{e^{-\lambda} \lambda^y}{y!}$
+\item Gamma PDF: $p(y) = \frac{\beta^{\alpha}}{\Gamma(\alpha)} y^{\alpha-1} e^{-\beta y}$
+\end{itemize}
+
+\medskip
+\red
+\begin{eqnarray*}
+p(\lambda | \mathbf{y}) &\propto& p(\mathbf{y} | \lambda) p(\lambda) \\
+&=& \prod_{i=1}^n \frac{e^{-\lambda} \lambda^{y_i}}{y_i!} \times \frac{\beta^{\alpha}}{\Gamma(\alpha)} \lambda^{\alpha-1} e^{-\beta \lambda}\\
+&\propto& \prod_{i=1}^n e^{-\lambda} \lambda^{y_i} \times \lambda^{\alpha-1} e^{-\beta \lambda}\\
+&=& e^{-n\lambda - \beta \lambda} \lambda^{\sum_{i=1}^n y_i + \alpha - 1} \\
+&=& e^{-\lambda (n+\beta)} \lambda^{\sum_{i=1}^n y_i + \alpha - 1} \\\\
+p(\lambda | \mathbf{y}) &\propto& e^{-\lambda (n+\beta)} \lambda^{\sum_{i=1}^n y_i + \alpha - 1} 
+\end{eqnarray*}
+This looks like the kernel for a Gamma distribution.  Turns out the posterior is a Gamma($\sum_{i=1}^n y_i + \alpha, n+\beta$) distribution.
+\end{enumerate}
+
+\end{document}
+
+
+
+
+

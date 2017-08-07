@@ -1,0 +1,92 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[latin1]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{fullpage}
+\usepackage{color}
+\author{Patrick Lam}
+
+\parindent=0in
+\newcommand{\red}{\color{red}}
+\newcommand{\black}{\color{black}}
+\begin{document}
+
+\begin{center}
+\begin{Large}Week 1 Problems\end{Large}
+\end{center}
+\bigskip
+\begin{enumerate}
+
+\item An urn contains 10 red balls and 15 white balls. You pick two balls at random without replacement. 
+
+\begin{enumerate}
+\item[a)] What is the probability that the first ball is red?
+
+\item[b)] What is the probability that the second ball is red?
+
+\item[c)] What is the probability that both balls are white?
+
+\item[d)] What is the probability that the second ball is red given that the first ball is white?
+
+\item[e)] What is the probability that the first ball is red given that the second ball is white?
+
+\end{enumerate}
+
+\bigskip
+
+\item (From Gelman 3.7) A student sits on a street corner for an hour and records the number of bicycles $b$ and the number of other vehicles $v$ that go by.  Two models are considered:
+\begin{itemize}
+\item The outcomes $b$ and $v$ have independent Poisson distributions, with unknown means $\theta_b$ and $\theta_v$.
+\item The outcome $b$ has a binomial distribution, with unknown probability $p$ and sample size $b + v$.
+\end{itemize}
+Show that the two models have the same likelihood if we define $p = \frac{\theta_b}{\theta_b + \theta_v}$. \\
+
+Hints:
+\begin{itemize}
+\item Find the conditional distribution of $b$ conditioning on information you know.
+\item If $X \sim \mathrm{Poisson}(\theta_1)$ and $Y \sim \mathrm{Poisson}(\theta_2)$, then $X+Y \sim \mathrm{Poisson}(\theta_1 + \theta_2)$.
+\end{itemize}
+
+
+\bigskip 
+
+\item Let $X \sim$ Uniform(1,4). Use calculus to find $E(X)$ and Var($X$).
+
+\bigskip 
+
+\item 
+\begin{enumerate}
+\item[a)]
+Suppose you have $n$ independent observations $X_i$ from an exponential distribution where 
+\begin{eqnarray*}
+p(x_i | \lambda) = \lambda e^{-\lambda x_i}
+\end{eqnarray*}
+Analytically find the maximum likelihood estimate of $\lambda$.
+\medskip
+\item[b)] Now reparameterize the distribution for $X_i$ in terms of $\tau$ where 
+\begin{eqnarray*}
+\tau = \frac{1}{\lambda}
+\end{eqnarray*}
+Find the MLE for $\tau$.
+\end{enumerate}
+
+\bigskip
+
+\item Suppose that $X$ follows a Gamma($\alpha, \beta$) distribution.  Show that $\frac{1}{X}$ follows an Inv-Gamma($\alpha$, $\beta$) distribution.
+
+\begin{itemize}
+\item Gamma PDF: $p(y) = \frac{\beta^{\alpha}}{\Gamma(\alpha)} y^{\alpha-1} e^{-\beta y}$
+\item Inverse Gamma PDF: $p(y) = \frac{\beta^{\alpha}}{\Gamma(\alpha)} y^{-(\alpha+1)} e^{-\beta/y}$
+\item Change of Variables formula: Let $Y = g(X)$ and $X = g^{-1}(Y)$.  Then 
+\begin{eqnarray*}
+p_Y(y) = p_X(g^{-1}(y)) \left \vert \frac{d}{dy} g^{-1}(y) \right \vert
+\end{eqnarray*}
+\end{itemize}
+
+\bigskip
+
+
+\end{enumerate}
+
+\end{document}

@@ -1,0 +1,635 @@
+\documentclass{beamer}
+
+
+\usetheme{default}
+\usepackage{subfigure}
+\usepackage{amsmath}
+\usepackage{Sweave}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{multicol}
+\usepackage{bm}
+\SweaveOpts{eps=F}
+
+\author{Patrick Lam}
+\title{Conjugate Models}
+\date{}
+%\date{September 29, 2008}
+
+\begin{document}
+
+\newcommand{\red}{\textcolor{red}}
+\newcommand{\blue}{\textcolor{blue}}
+\newcommand{\purple}{\textcolor{purple}}
+
+\frame{\titlepage}
+
+\begin{frame}
+\frametitle{Outline}
+\tableofcontents
+\end{frame}
+
+\section{Conjugate Models}
+
+\begin{frame}
+\frametitle{Outline}
+\tableofcontents[currentsection]
+\end{frame}
+
+\subsection{What is Conjugacy?}
+
+\begin{frame}
+\frametitle{Outline}
+\tableofcontents[currentsubsection]
+\end{frame}
+
+\begin{frame}
+\frametitle{Conjugacy}
+\pause
+Suppose we have a Bayesian model with a likelihood $p(y | \theta)$ and
+a \red{prior $p(\theta)$}.\\
+\pause
+\bigskip
+If we multiply our likelihood and \red{prior}, we get our \blue{posterior
+$p(\theta | y)$} up to a constant of proportionality.\\
+\pause
+\bigskip
+If our \blue{posterior} is a distribution that is of the same family as our
+\red{prior}, then we have \textit{conjugacy}.  \pause We say that the
+\red{prior} is conjugate to the likelihood.\\
+\pause
+\bigskip
+Conjugate models are great because we know the exact distribution of
+the \blue{posterior} so we can easily simulate or derive quantities of
+interest analytically.\\
+\pause
+\bigskip
+In practice, we rarely have conjugacy.
+\end{frame}
+
+\begin{frame}
+\frametitle{Brief List of Conjugate Models}
+\pause
+\scriptsize
+\begin{table}
+\begin{center}
+\begin{tabular}{c|c|c}
+Likelihood & Prior & Posterior\\
+\hline
+Binomial & Beta & Beta\\
+Negative Binomial & Beta & Beta\\
+Poisson & Gamma & Gamma\\
+Geometric & Beta & Beta\\
+Exponential & Gamma & Gamma\\
+Normal (mean unknown) & Normal & Normal\\
+Normal (variance unknown) & Inverse Gamma & Inverse Gamma\\
+Normal (mean and variance unknown) & Normal/Gamma & Normal/Gamma\\
+Multinomial & Dirichlet & Dirichlet
+\end{tabular}
+\end{center}
+\end{table}
+\normalsize
+\end{frame}
+
+\subsection{The Beta-Binomial Model}
+
+\begin{frame}
+\frametitle{Outline}
+\tableofcontents[currentsubsection]
+\end{frame}
+
+
+\begin{frame}
+\frametitle{A Binomial Example}
+\pause
+Suppose we have vector of data on voter turnout for a random sample of $n$
+voters in the 2004 US Presidential election.   \\
+\pause
+\bigskip
+We can model the voter turnout with a binomial model.\\
+\pause
+\begin{equation*}
+Y \sim \mathrm{Binomial}(n, \pi)
+\end{equation*}
+\pause
+\bigskip
+Quantity of interest: $\pi$ (voter turnout)\\
+\pause
+\bigskip
+Assumptions:
+\pause
+\begin{itemize}
+\item Each voter's decision to vote follows the Bernoulli
+distribution. \pause
+\item Each voter has the same probability of voting.  \pause
+(unrealistic) \pause
+\item Each voter's decision to vote is independent.  \pause (unrealistic)
+\end{itemize}
+\end{frame}
+
+%\subsection{The Conjugate Beta Prior}
+
+\begin{frame}
+\frametitle{The Conjugate Beta Prior}
+\pause
+We can use the beta distribution as a \textcolor{red}{prior} for $\pi$, since the beta
+distribution is conjugate to the binomial distribution.\\
+\pause
+\begin{eqnarray*}
+\textcolor{blue}{p(\pi | y)} &\propto& p(y | \pi) \textcolor{red}{p(\pi)} \\
+\pause
+&=& \mathrm{Binomial}(n, \pi) \times
+\textcolor{red}{\mathrm{Beta}(\alpha, \beta)}\\
+\pause
+&=& \binom{n}{y} \pi^y (1 - \pi)^{(n-y)} \textcolor{red}{\frac{\Gamma (\alpha + \beta)}{\Gamma (\alpha)
+\Gamma (\beta)} \pi^{(\alpha - 1)} (1 - \pi)^{(\beta-1)}}\\
+\pause
+&\propto& \pi^y (1 - \pi)^{(n-y)} \textcolor{red}{\pi^{(\alpha - 1)}
+(1 - \pi)^{(\beta-1)}} \\\\
+\pause
+\textcolor{blue}{p(\pi | y)} &\textcolor{blue}{\propto}& \textcolor{blue}{\pi^{y+\alpha-1} (1-\pi)^{n-y+\beta-1}}
+\end{eqnarray*}
+\pause
+The \textcolor{blue}{posterior distribution} is simply a
+\textcolor{blue}{Beta($y+\alpha, n-y+\beta$)} distribution. \pause
+Effectively, our \textcolor{red}{prior} is just adding $\alpha-1$
+successes and $\beta - 1$ failures to the dataset.
+\end{frame}
+
+\begin{frame}
+\frametitle{The Uninformative (Flat) Uniform Prior}
+\pause
+Suppose we have no strong prior beliefs about the parameters.  \pause
+We can choose a \textcolor{red}{prior} that gives equal weight to all possible values
+of the parameters, essentially an uninformative or ``flat'' \textcolor{red}{prior}. \pause
+\begin{equation*}
+\textcolor{red}{p(\pi) = \mathrm{constant}}
+\end{equation*}
+for all values of $\pi$. \\
+\pause
+\bigskip
+For the binomial model, one example of a flat \textcolor{red}{prior} is the \textcolor{red}{Beta(1,1) prior}:
+\pause
+\begin{eqnarray*}
+\textcolor{red}{p(\pi)} &\textcolor{red}{=}& \textcolor{red}{\frac{\Gamma (2)}{\Gamma (1)
+\Gamma (1)} \pi^{(1 - 1)} (1 - \pi)^{(1-1)}} \\
+\pause
+&\textcolor{red}{=}& \textcolor{red}{1}
+\end{eqnarray*}
+\pause
+which is the Uniform distribution over the $[0,1]$ interval.
+\end{frame}
+
+\begin{frame}[fragile]
+Since we know that a Binomial likelihood and a
+\textcolor{red}{Beta(1,1) prior} produces a \textcolor{blue}{Beta($y+1,
+n-y+1$) posterior}, we can simulate the \textcolor{blue}{posterior} in R.\\
+\pause
+\bigskip
+Suppose our turnout data had 500 voters, of which 285 voted.
+\pause
+\medskip
+\tiny{
+<<echo=F, results=hide>>=
+set.seed(54321)
+turnout <- rbinom(500, size = 1, prob = .55)
+options(width = 80)
+@ 
+
+<<>>=
+table(turnout)
+@
+} 
+\pause
+\bigskip
+\normalsize{
+Setting our \textcolor{red}{prior} parameters at $\alpha = 1$ and $\beta = 1$,
+}
+\medskip
+\pause
+\tiny{
+<<>>=
+a <- 1
+b <- 1
+@
+} 
+\pause
+\bigskip
+\normalsize{
+we get the \textcolor{blue}{posterior}
+}
+\medskip
+\pause
+\tiny{
+<<>>=
+posterior.unif.prior <- rbeta(10000, shape1 = 285 + a, shape2 = 500 -
+  285 + b)
+@
+}
+\normalsize
+\end{frame}
+
+\section{The Normal Model}
+
+\begin{frame}
+\frametitle{Outline}
+\tableofcontents[currentsection]
+\end{frame}
+
+\subsection{Normal Model with Unknown Mean, Known Variance}
+
+\begin{frame}
+\frametitle{Outline}
+\tableofcontents[currentsubsection]
+\end{frame}
+
+\begin{frame}
+\frametitle{Normal Model with Unknown Mean, Known Variance}
+\pause
+Suppose we wish to estimate a model where the likelihood of the data
+is normal with an unknown mean $\mu$ and a known variance $\sigma^2$.\\
+\bigskip
+\pause
+Our parameter of interest is $\mu$. \\
+\bigskip
+\pause
+We can use a conjugate \red{Normal prior} on $\mu$, with mean \red{$\mu_0$} and
+variance \red{$\tau^2_0$}.
+\bigskip
+\pause
+\begin{eqnarray*}
+\blue{p(\mu | \bm{y}, \sigma^2)} &\propto& p(\bm{y} | \mu, \sigma^2)
+\red{p(\mu)} \\
+\pause
+\blue{\mathrm{Normal}(\mu_1, \tau^2_1)} &=& \mathrm{Normal}(\mu, \sigma^2)
+\times \red{\mathrm{Normal}(\mu_0, \tau^2_0)}
+\end{eqnarray*}
+\end{frame}
+
+\begin{frame}
+Let $\theta$ represent our parameter of interest, in this case $\mu$.
+\pause
+\footnotesize
+\begin{eqnarray*}
+\blue{p(\theta | \bm{y})} &\propto& \prod_{i=1}^n \frac{1}{\sqrt{2 \pi
+\sigma^2}} \exp \left( -\frac{(y_i-\theta)^2}{2\sigma^2} \right) \times
+\red{\frac{1}{\sqrt{2 \pi \tau_0^2}} \exp \left( -\frac{(\theta - \mu_0
+)^2}{2 \tau_0^2} \right)} \\
+\pause
+&\propto& \exp \left( -\sum_{i=1}^n \frac{(y_i-\theta)^2}{2\sigma^2}
+\red{-\frac{(\theta - \mu_0)^2}{2 \tau_0^2}} \right) \\
+\pause
+&=& \exp \left[ \purple{-\frac{1}{2}} \left( \sum_{i=1}^n
+\frac{(y_i-\theta)^2}{\sigma^2} \red{+\frac{(\theta - \mu_0)^2}{\tau_0^2}} \right) \right] \\
+\pause
+&=& \exp \left[ \purple{-\frac{1}{2 \sigma^2 \tau_0^2}} \left(
+\purple{\tau_0^2} \sum_{i=1}^n (y_i-\theta)^2 \red{+}\purple{\sigma^2}\red{(\theta - \mu_0)^2} \right) \right] \\
+\pause
+&=& \exp \left[ \purple{-\frac{1}{2 \sigma^2 \tau_0^2}} \left(
+\purple{\tau_0^2} \sum_{i=1}^n (y_i^2 - 2\theta y_i + \theta^2)
+\red{+}\purple{\sigma^2}\red{(\theta^2 - 2 \theta \mu_0 + \mu_0^2)} \right) \right] \\
+\end{eqnarray*}
+\normalsize
+\end{frame}
+
+\begin{frame}
+We can multiply the $2\theta y_i$ term in the summation by
+\textcolor{cyan}{$\frac{n}{n}$} in order to get the equations in
+terms of the sufficient statistic $\bar{y}$.
+\pause
+\footnotesize
+\begin{eqnarray*}
+\blue{p(\theta | \bm{y})} &\propto& \exp \left[ \purple{-\frac{1}{2 \sigma^2
+\tau_0^2}} \left( \purple{\tau_0^2} \sum_{i=1}^n (y_i^2 - 2\theta
+\textcolor{cyan}{\frac{n}{n}} y_i + \theta^2) \red{+}\purple{\sigma^2}\red{(\theta^2 - 2 \theta \mu_0 + \mu_0^2)} \right) \right] \\
+\pause
+&=& \exp \left[ \purple{-\frac{1}{2 \sigma^2
+\tau_0^2}} \left( \purple{\tau_0^2} \sum_{i=1}^n y_i^2 -
+\purple{\tau_0^2} 2\theta n \bar{y} + \purple{\tau_0^2} n \theta^2 \red{+\theta^2}\purple{\sigma^2} \red{- 2 \theta \mu_0}
+\purple{\sigma^2} + \red{\mu_0^2} \purple{\sigma^2} \right) \right] \\
+\pause
+\end{eqnarray*}
+\normalsize
+We can then factor the terms into several parts.  Since $\red{\mu_0^2}
+\purple{\sigma^2}$ and $\purple{\tau_0^2} \sum_{i=1}^n y_i^2$ do not
+contain $\theta$, we can represent them as some constant
+\textcolor{brown}{$k$}, which we will drop into the normalizing constant.
+\pause
+\footnotesize
+\begin{eqnarray*}
+\blue{p(\theta | \bm{y})} &\propto& \exp \left[ \purple{-\frac{1}{2 \sigma^2
+\tau_0^2}} \left( \purple{\theta^2}\left(\purple{\sigma^2} +
+\purple{\tau_0^2} n \right) - \purple{2 \theta} \left( \red{\mu_0}
+\purple{\sigma^2} + \purple{\tau_0^2} n \bar{y} \right) + \textcolor{brown}{k} \right) \right] \\
+\pause
+&=& \exp \left[ \purple{-\frac{1}{2}} \left( \purple{\theta^2}\left(\frac{\purple{\sigma^2} +
+\purple{\tau_0^2} n}{\purple{\sigma^2 \tau_0^2}} \right) - \purple{2
+\theta} \left( \frac{\red{\mu_0} \purple{\sigma^2} + \purple{\tau_0^2}
+n \bar{y}}{\purple{\sigma^2 \tau_0^2}} \right)  + \textcolor{brown}{k} \right) \right] \\
+\pause
+&=& \exp \left[ \purple{-\frac{1}{2}} \left(
+\purple{\theta^2} \left( \frac{\purple{1}}{\purple{\tau_0^2}} +
+\frac{n}{\purple{\sigma^2}} \right) - \purple{2 \theta} \left(
+\frac{\red{\mu_0}}{\purple{\tau_0^2}} + \frac{n
+\bar{y}}{\purple{\sigma^2}} \right)  + \textcolor{brown}{k} \right) \right] 
+\end{eqnarray*}
+\normalsize
+\end{frame}
+
+\begin{frame}
+Let's multiply by $\frac{ \left(
+\frac{1}{\tau_0^2} + \frac{n}{\sigma^2} \right)}{ \left( \frac{1}{\tau_0^2} +
+\frac{n}{\sigma^2} \right)}$ in order to simplify the $\theta^2$ term.
+\pause
+\footnotesize
+\begin{eqnarray*}
+\blue{p(\theta | \bm{y})} &\propto& \exp \left[ \purple{-\frac{1}{2}}
+\left( \frac{1}{\tau_0^2} +
+\frac{n}{\sigma^2} \right)\left(
+\purple{\theta^2} \left( \frac{\frac{\purple{1}}{\purple{\tau_0^2}} +
+\frac{n}{\purple{\sigma^2}}}{\frac{1}{\tau_0^2} +
+\frac{n}{\sigma^2}} \right) - \purple{2 \theta} \left(
+\frac{\frac{\red{\mu_0}}{\purple{\tau_0^2}} + \frac{n
+\bar{y}}{\purple{\sigma^2}}}{\frac{1}{\tau_0^2} +
+\frac{n}{\sigma^2}} \right)  + \textcolor{brown}{k} \right) \right] \\
+\pause
+&=&  \exp \left[ \purple{-\frac{1}{2}}
+\left( \frac{1}{\tau_0^2} +
+\frac{n}{\sigma^2} \right)\left(
+\purple{\theta^2}  - \purple{2 \theta} \left(
+\frac{\frac{\red{\mu_0}}{\purple{\tau_0^2}} + \frac{n
+\bar{y}}{\purple{\sigma^2}}}{\frac{1}{\tau_0^2} +
+\frac{n}{\sigma^2}} \right)  + \textcolor{brown}{k} \right) \right] \\
+\pause
+&=& \exp \left[ \purple{-\frac{1}{2}}
+\left( \frac{1}{\tau_0^2} +
+\frac{n}{\sigma^2} \right)\left(
+\purple{\theta}  - \left(
+\frac{\frac{\red{\mu_0}}{\purple{\tau_0^2}} + \frac{n
+\bar{y}}{\purple{\sigma^2}}}{\frac{1}{\tau_0^2} +
+\frac{n}{\sigma^2}} \right) \right)^2 \right] \\
+\end{eqnarray*}
+\pause
+\normalsize
+Finally, we have something that looks like the density function of a
+Normal distribution!
+\end{frame}
+
+\begin{frame}
+\footnotesize
+\begin{eqnarray*}
+\blue{p(\theta | \bm{y})} &\propto&  \exp \left[ -\frac{1}{2}
+\left( \frac{1}{\tau_0^2} +
+\frac{n}{\sigma^2} \right)\left(
+\theta  - \left(
+\frac{\frac{\mu_0}{\tau_0^2} + \frac{n
+\bar{y}}{\sigma^2}}{\frac{1}{\tau_0^2} +
+\frac{n}{\sigma^2}} \right) \right)^2 \right] \\
+\end{eqnarray*}
+\pause
+\normalsize
+Posterior Mean: \blue{$\mu_1$} = $\frac{\left( \frac{\mu_0}{\tau_0^2} + \frac{n
+\bar{y}}{\sigma^2}\right)}{\left( \frac{1}{\tau_0^2} +
+\frac{n}{\sigma^2}\right)}$ \\
+\bigskip
+\pause
+Posterior Variance: \blue{$\tau_1^2$} = $\left( \frac{1}{\tau_0^2} +
+\frac{n}{\sigma^2} \right)^{-1}$\\
+\bigskip
+\pause
+Posterior Precision: \blue{$\frac{1}{\tau_1^2}$} =
+$\red{\frac{1}{\tau_0^2}} + \frac{n}{\sigma^2} $\\
+\bigskip
+\pause
+\blue{Posterior Precision} is just the sum of the \red{prior
+precision} and the data precision.
+\end{frame}
+
+\begin{frame}
+We can also look more closely at how the prior mean $\red{\mu_0}$ and
+the posterior mean $\blue{\mu_1}$ relate to each other.
+\pause
+\footnotesize
+\begin{eqnarray*}
+ \blue{\mu_1} &=& \frac{\left( \frac{\red{\mu_0}}{\tau_0^2} + \frac{n
+\bar{y}}{\sigma^2}\right)}{\left( \frac{1}{\tau_0^2} +
+\frac{n}{\sigma^2}\right)}\\
+\pause
+&=& \frac{\frac{\red{\mu_0} \sigma^2 + \tau_0^2 n \bar{y}}{\tau_0^2
+\sigma^2}}{\frac{\sigma^2 + n\tau_0^2}{\tau_0^2 \sigma^2}} \\
+\pause
+&=& \frac{\red{\mu_0} \sigma^2 + \tau^2_0 n \bar{y}}{\sigma^2 + n\tau_0^2}\\
+\pause
+&=& \frac{\red{\mu_0} \sigma^2}{\sigma^2 + n\tau_0^2} + \frac{\tau^2_0 n \bar{y}}{\sigma^2 + n\tau_0^2}
+\end{eqnarray*}
+\normalsize
+\pause
+\begin{itemize}
+\item As $n$ increases, data mean dominates prior mean.
+\pause
+\item As $\tau_0^2$ decreases (less prior variance, greater prior
+precision), our prior mean becomes more important.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{A Simple Example}
+\pause
+Suppose we have some (fake) data on the heights (in inches) of a
+random sample of 100 individuals in the U.S. population.
+\pause
+\medskip
+\tiny
+<<>>=
+known.sigma.sq <- 16
+unknown.mean <- 68
+n <- 100
+heights <- rnorm(n, mean = unknown.mean, sd = sqrt(known.sigma.sq)) 
+@
+\normalsize
+\pause
+\bigskip
+ We believe that the heights are normally distributed with some
+unknown mean $\mu$ and a known variance $\sigma^2 = 16$.\\
+\bigskip
+\pause
+Suppose before we see the data, we have a prior belief about the
+distribution of $\mu$.  Let our prior mean \red{$\mu_0 = 72$} and our prior
+variance \red{$\tau_0^2 = 36$.}
+\medskip
+\pause
+\tiny
+<<>>=
+mu0 <- 72
+tau.sq0 <- 36
+@ 
+\end{frame}
+
+\begin{frame}[fragile]
+Our posterior is a Normal distribution with Mean $\frac{\left( \frac{\mu_0}{\tau_0^2} + \frac{n
+\bar{y}}{\sigma^2}\right)}{\left( \frac{1}{\tau_0^2} +
+\frac{n}{\sigma^2}\right)}$ and Variance $\left( \frac{1}{\tau_0^2} +
+\frac{n}{\sigma^2} \right)^{-1}$
+\medskip
+\pause
+\tiny
+<<>>=
+post.mean <- (mu0/tau.sq0 + (n*mean(heights)/known.sigma.sq)) / (1/tau.sq0 +
+n/known.sigma.sq); post.mean
+post.var <- 1/(1/tau.sq0 + n/known.sigma.sq); post.var
+@ 
+\normalsize
+\end{frame}
+
+
+
+\subsection{Normal Model with Known Mean, Unknown Variance}
+
+\begin{frame}
+\frametitle{Outline}
+\tableofcontents[currentsubsection]
+\end{frame}
+
+\begin{frame}
+\frametitle{Normal Model with Known Mean, Unknown Variance}
+\pause
+Now suppose we wish to estimate a model where the likelihood of the data
+is normal with a known mean $\mu$ and an unknown variance $\sigma^2$.\\
+\bigskip
+\pause
+Now our parameter of interest is $\sigma^2$. \\
+\bigskip
+\pause
+We can use a conjugate \red{inverse gamma prior} on $\sigma^2$, with
+shape parameter \red{$\alpha_0$} and scale parameter \red{$\beta_0$}.
+\bigskip
+\pause
+\begin{eqnarray*}
+\blue{p(\sigma^2 | \bm{y}, \mu)} &\propto& p(\bm{y} | \mu, \sigma^2)
+\red{p(\sigma^2)} \\
+\pause
+\blue{\mathrm{Invgamma}(\alpha_1, \beta_1)} &=& \mathrm{Normal}(\mu, \sigma^2)
+\times \red{\mathrm{Invgamma}(\alpha_0, \beta_0)}
+\end{eqnarray*}
+\end{frame}
+
+\begin{frame}
+Let $\theta$ represent our parameter of interest, in this case $\sigma^2$.
+\pause
+\footnotesize
+\begin{eqnarray*}
+\blue{p(\theta | \bm{y}, \mu)} &\propto& \prod^n_{i=1}
+\frac{1}{\sqrt{2\pi \theta}} \exp \left( -\frac{(y_i-\mu)^2}{2\theta}
+\right) \times \red{\frac{\beta_0^{\alpha_0}}{\Gamma(\alpha_0)}
+\theta^{-(\alpha_0+1)} \exp \left( - \frac{\beta_0}{\theta} \right)}\\
+\pause
+&\propto& \prod^n_{i=1} \theta^{-\frac{1}{2}} \exp \left(
+-\frac{(y_i-\mu)^2}{2\theta} \right) \times
+\red{\theta^{-(\alpha_0+1)} \exp \left( - \frac{\beta_0}{\theta} \right)}\\
+\pause
+&=& \theta^{-\frac{n}{2}} \exp \left(
+-\frac{\sum_{i=1}^n (y_i-\mu)^2}{2\theta} \right) \times
+\red{\theta^{-(\alpha_0+1)} \exp \left( - \frac{\beta_0}{\theta} \right)}\\
+\pause
+&=& \theta^{-(\red{\alpha_0} + \frac{n}{2} \red{+ 1})} \exp \left[ - \left( \red{\frac{\beta_0}{\theta}}
++\frac{\sum_{i=1}^n (y_i-\mu)^2}{2\theta} \right) \right] \\
+\pause
+&=& \theta^{-(\red{\alpha_0} + \frac{n}{2} \red{+ 1})}
+\exp \left[ - \left( \frac{\red{2\beta_0}
++2\left( \frac{\sum_{i=1}^n (y_i-\mu)^2}{2}\right)}{\purple{2\theta}} \right) \right] \\
+\pause
+&=& \theta^{-(\red{\alpha_0} + \frac{n}{2} \red{+ 1})}
+\exp \left[ - \left( \frac{\red{\beta_0}
++ \frac{\sum_{i=1}^n (y_i-\mu)^2}{2}}{\purple{\theta}} \right) \right] \\
+\end{eqnarray*} 
+\normalsize
+\pause
+This looks like the density of an inverse gamma distribution!
+\end{frame}
+
+\begin{frame}
+\footnotesize
+\begin{eqnarray*}
+\blue{p(\theta | \bm{y}, \mu)} &\propto& \theta^{-(\alpha_0 +
+\frac{n}{2} + 1)} \exp \left[ - \left( \frac{\beta_0
++ \frac{\sum_{i=1}^n (y_i-\mu)^2}{2}}{\theta} \right) \right] 
+\end{eqnarray*}
+\pause
+\begin{eqnarray*}
+\blue{\alpha_1} &=& \alpha_0 + \frac{n}{2}\\
+\pause
+\blue{\beta_1} &=& \beta_0 + \frac{\sum_{i=1}^n (y_i-\mu)^2}{2}
+\end{eqnarray*}
+\normalsize
+\pause
+Our posterior is an \blue{Invgamma($\alpha_0 + \frac{n}{2},\beta_0 + \frac{\sum_{i=1}^n (y_i-\mu)^2}{2}$)} distribution.
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{A Simple Example}
+\pause
+Again suppose we have some (fake) data on the heights (in inches) of a
+random sample of 100 individuals in the U.S. population.
+\pause
+\medskip
+\tiny
+<<>>=
+known.mean <- 68
+unknown.sigma.sq <- 16
+n <- 100
+heights <- rnorm(n, mean = known.mean, sd = sqrt(unknown.sigma.sq)) 
+@
+\normalsize
+\pause
+\bigskip
+ We believe that the heights are normally distributed with a known
+mean $\mu = 68$ and some unknown variance $\sigma^2$.\\
+\bigskip
+\pause
+Suppose before we see the data, we have a prior belief about the
+distribution of $\sigma^2$.  Let our prior shape \red{$\alpha_0 = 5$} and
+our prior scale \red{$\beta_0 = 20$.}
+\medskip
+\pause
+\tiny
+<<>>=
+alpha0 <- 5
+beta0 <- 20
+@ 
+\end{frame}
+
+\begin{frame}[fragile]
+Our posterior is a inverse gamma distribution with shape $\alpha_0 +
+\frac{n}{2}$ and scale $\beta_0 + \frac{\sum_{i=1}^n (y_i-\mu)^2}{2}$
+\medskip
+\pause
+\tiny
+<<>>=
+alpha1 <- alpha0 + n/2
+beta1 <- beta0 + sum((heights - known.mean)^2)/2
+library(MCMCpack)
+posterior <- rinvgamma(10000, alpha1, beta1)
+post.mean <- mean(posterior); post.mean
+post.var <- var(posterior); post.var
+@ 
+\normalsize
+\pause
+Hmm $\dots$ what if we increased our sample size?
+\end{frame}
+
+\begin{frame}[fragile]
+\tiny
+<<>>=
+n <- 1000
+heights <- rnorm(n, mean = known.mean, sd = sqrt(unknown.sigma.sq)) 
+alpha1 <- alpha0 + n/2
+beta1 <- beta0 + sum((heights - known.mean)^2)/2
+posterior <- rinvgamma(10000, alpha1, beta1)
+post.mean <- mean(posterior); post.mean
+post.var <- var(posterior); post.var
+@ 
+\end{frame}
+
+
+\end{document}

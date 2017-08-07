@@ -1,0 +1,792 @@
+\documentclass[]{beamer}
+
+\usepackage{bm}
+\usepackage{multicol}
+
+\title{Learning \LaTeX}
+\author{Patrick Lam}
+\date{}
+
+\newcommand{\red}{\color{red}}
+\newcommand{\black}{\color{black}}
+
+
+\begin{document}
+\maketitle
+
+\begin{frame}
+\frametitle{setting up}
+\pause
+\begin{enumerate}
+\item download a TeX distribution (MiKTeX, MacTeX, etc.)
+\item download an editor (Texmaker, WinEDT, XEmacs, etc.)
+\item start a .tex file in editor
+\item work only in the .tex file
+\end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]
+\begin{center}
+Let {\tt <>} denote things you fill in, but without the {\tt <>}. \\
+
+\pause 
+\bigskip
+For example, for {\tt <myname>}, I would write {\tt Patrick}. \\
+\end{center}
+\end{frame}
+
+\begin{frame}
+\begin{center}
+Example code is in \red{red}
+\end{center}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{commands}
+\pause
+You have to tell \LaTeX\hspace{1pt} to do everything with commands, which always begin with $\backslash$: \\
+
+\pause
+\bigskip
+
+\red
+\begin{verbatim}
+\<command>
+\<command>{<something>}
+\<command>[<options>]{<something>}
+\end{verbatim}
+\black 
+
+\end{frame}
+
+\section{Getting Started}
+\begin{frame}[fragile]
+\frametitle{the bare minimum}
+\pause
+\red
+\begin{verbatim}
+\documentclass[<options>]{<class>}
+
+\begin{document}
+
+My text here!
+
+\end{document}
+
+\end{verbatim}
+\black 
+\pause
+{\tt article}, {\tt beamer} $\in$ {\tt <class>} \pause \\
+translation: some {\tt class} types include {\tt article} and {\tt beamer}\\
+\pause
+\bigskip
+For almost everything, we will be using {\tt article}.
+\end{frame}
+
+\section{Compiling}
+\begin{frame}[fragile]
+\frametitle{.tex -$>$ something readable }
+On your .tex file, compile using LaTeX or PDFLaTeX (usually buttons or commands on your editor).
+\pause
+\bigskip
+\begin{itemize}
+\item .tex file -$>$ LaTeX -$>$ .dvi file 
+\pause
+\begin{itemize}
+\item you can convert .dvi to .pdf with dvi2pdf or dvi2ps and ps2pdf
+\end{itemize}
+\medskip
+\pause
+\item .tex file -$>$ PDFLaTeX -$>$ .pdf file
+\end{itemize}
+\pause
+\bigskip
+Output files will be in the same directory as your .tex file. 
+\end{frame}
+
+\begin{frame}[fragile]
+\begin{center}
+Try compiling now! \\
+\pause
+\bigskip
+\bigskip
+If you get an error message, something is wrong in your code.\\
+\pause
+\bigskip
+\bigskip
+Compile often to catch errors before they pile up!
+\end{center}
+\end{frame}
+
+\begin{frame}[fragile]
+\begin{center}
+Let's get started with more complicated stuff!
+\end{center}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{title, author, date}
+Let's give our article a title, author, and date.
+\pause
+\red
+\begin{verbatim}
+\documentclass{article}
+
+\title{This is my title}
+\author{Patrick Lam}
+\date{}
+
+\begin{document}
+
+My text here!
+
+\end{document}
+\end{verbatim}
+\black 
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{packages}
+Tell \LaTeX\hspace{1pt} to use some packages before beginning the document:
+\pause
+\red
+\begin{verbatim}
+\documentclass{article}
+
+\usepackage{<package>}
+\usepackage{<package>}
+
+\title{This is my title}
+\author{Patrick Lam}
+\date{}
+
+\begin{document}
+
+My text here!
+
+\end{document}
+
+\end{verbatim}
+\black 
+\end{frame}
+
+\begin{frame}[fragile]
+Everything else from now on goes after {\tt $\backslash$begin\{document\}}.
+\pause
+\bigskip
+\red
+\begin{verbatim}
+\begin{document}
+
+Everything I write should go here.
+
+\end{document}
+\end{verbatim}
+\black 
+\end{frame}
+
+\begin{frame}
+\begin{center}
+OK, let's try compiling what we have. \\
+\pause
+\bigskip
+\bigskip
+Where is our title, abstract and date?
+\end{center}
+\end{frame}
+
+\begin{frame}[fragile]
+We have to tell \LaTeX\hspace{1pt} to put it in our document with {\tt $\backslash$maketitle} or {\tt $\backslash$titlepage}:
+\red
+\pause
+\begin{verbatim}
+\begin{document}
+\maketitle
+
+My text here!
+
+\end{document}
+\end{verbatim}
+\black 
+\pause
+\bigskip
+Try compiling again!
+\end{frame}
+
+\section{Line Spacing}
+\begin{frame}[fragile]
+\frametitle{lines}
+\LaTeX\hspace{1pt} is smart with line spacing. \\
+\pause
+\bigskip
+To start a new paragraph, skip a line in your .tex file:
+\pause
+\red
+\begin{verbatim}
+Paragraph 1
+
+Paragraph 2
+
+Paragraph 3
+\end{verbatim}
+\black 
+
+\end{frame}
+
+\begin{frame}[fragile]
+To end a line and start a new line, use $\backslash\backslash$:
+\pause
+\red
+\begin{verbatim}
+This is my line. \\
+This is my new line.
+\end{verbatim}
+\black 
+\end{frame}
+
+\begin{frame}[fragile]
+To put space between lines, use multiple {\tt $\backslash\backslash$, $\backslash$bigskip, $\backslash$medskip}, or {\tt $\backslash$smallskip}:
+\pause
+\red
+\begin{verbatim}
+This is my line. \\\\
+This is my new line. \\
+\bigskip
+This is another line.
+\end{verbatim}
+\black 
+\end{frame}
+
+\begin{frame}[fragile]
+To double space, use the {\tt setspace} package and the {\tt $\backslash$doublespacing} command:
+\pause
+\red
+\begin{verbatim}
+\documentclass{article}
+
+\usepackage{setspace}
+
+\begin{document}
+
+\doublespacing
+
+This document is now doublespaced.\\
+See. 
+
+\end{document}
+\end{verbatim}
+\black 
+\end{frame}
+
+
+\begin{frame}
+\frametitle{full page}
+\begin{itemize}
+\item by default, \LaTeX\hspace{1pt} uses large margins and single spacing as the optimal format
+\pause
+\item to get regular margins, use the {\tt fullpage} package
+\end{itemize}
+\end{frame}
+
+\section{Sectioning}
+\begin{frame}[fragile]
+\frametitle{sectioning}
+\LaTeX\hspace{1pt} can divide out document into sections with titles using $\backslash$section (with numbers) or $\backslash$section* (without numbers). 
+\pause
+\red
+\begin{verbatim}
+\section{My First Section Title} 
+Text here
+
+\section{My Second Section Title}
+More text here.
+\end{verbatim}
+\black
+\pause
+\bigskip
+$\backslash$subsection and $\backslash$subsubsection also available.
+\pause
+\bigskip
+Try and compile!
+\end{frame}
+
+\section{Environments}
+\begin{frame}[fragile]
+\frametitle{environments}
+\pause
+Think of environments as creating space in your document for certain activities.  \pause Environments must always begin and end. \\
+
+\red
+\begin{verbatim}
+\begin{<environment>}
+
+Stuff here!
+
+\end{<environment>}
+\end{verbatim}
+\black 
+\pause
+{\tt document}, {\tt verbatim}, {\tt equation}, {\tt eqnarray}, {\tt table}, {\tt tabular}, {\tt figure}, {\tt center}, {\tt itemize}, {\tt enumerate} $\in$ {\tt <environment>}
+
+\end{frame}
+
+\section{Lists}
+\begin{frame}[fragile]
+\frametitle{lists}
+Let's create a list environment with {\tt itemize} or {\tt enumerate}:
+\pause
+\red
+\begin{verbatim}
+My favorite drinks:
+
+\begin{itemize}
+\item Barq's Root Beer
+\item Dr. Pepper
+\item Orange Soda
+\end{itemize}
+\end{verbatim}
+\pause
+\bigskip
+\black 
+What's the difference between the two?
+\end{frame}
+
+
+\section{Math}
+\begin{frame}
+\frametitle{math mode}
+One of the major advantages of \LaTeX\hspace{1pt} is in typing math. \\
+\pause
+\bigskip
+There are many ways to go to math mode.  I like:
+\pause
+\bigskip
+\begin{itemize}
+\item \$ for inline math \pause
+\item {\tt eqnarray} environment for centered math and equations
+\end{itemize}
+\bigskip
+\pause
+Others include:
+\bigskip
+\begin{itemize}
+\item \$\$
+\item {\tt equation} environment for one equation only
+\item {\tt displaymath} environment
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+For math within a line such as $\alpha$ or $5 > 4$, enclose the math in dollar signs: \\
+\pause
+\bigskip
+\red
+{\tt
+For math within a line such as \$$\backslash$alpha\$ or \$5 $>$ 4\$, enclose the math in dollar signs:
+}
+\black 
+\end{frame}
+
+\begin{frame}[fragile]
+For equations or centered math, use the {\tt eqnarray} environment.  \pause You can align using \&.
+\pause
+\begin{eqnarray}
+5+4 &=& 9 \\
+3+2 &=& 5
+\end{eqnarray}
+\pause
+\red
+\begin{verbatim}
+\begin{eqnarray}
+5+4 &=& 9 \\
+3+2 &=& 5
+\end{eqnarray}
+\end{verbatim}
+\black 
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{other math stuff}
+\pause
+\begin{itemize}
+\item Greek symbols are intuitive: \red {\tt $\backslash$delta $\backslash$Delta} \black 
+\pause
+\item scripting is easy: $x_{ij} + x^2$ is \red \verb x_{ij}+x^2 \black 
+\pause
+\item bolding math is with \red \verb \mathbf{<text>} \black \hspace{1pt} for non-Greek symbols and \red \verb \bm{<symbol>} \black  \hspace{1pt} in the {\tt bm} package for Greek symbols
+\pause
+\item fractions are \red \verb \frac{<numerator>}{<denominator>} \black
+\pause
+\item square roots are \red \verb \sqrt{<number>} \black 
+\pause
+\item many many other things you can do 
+\pause
+\item use google to search!
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+Try typing the following equations:
+\begin{eqnarray*}
+\bm{\hat{\beta}} &=& (\mathbf{X'X})^{-1} \mathbf{X'y} \\
+f(x) &=& \frac{1}{\sigma \sqrt{2 \pi}} \exp \left( -\frac{(x-\mu)^2}{2\sigma^2} \right)
+\end{eqnarray*}
+\end{frame}
+
+\section{Tables}
+\begin{frame}[fragile]
+\frametitle{tables}
+Tables are created using the {\tt tabular} environment.
+\pause
+\begin{multicols}{2}
+\red
+\begin{verbatim}
+\begin{tabular}{l|c|r}
+year & country & leader \\
+\hline
+2009 & US & Obama \\
+2009 & UK & Brown \\
+\hline
+\end{tabular}
+\end{verbatim}
+\black 
+\newpage
+\pause
+\bigskip
+\bigskip
+\bigskip
+\begin{tabular}{l|c|r}
+year & country & leader \\
+\hline
+2009 & US & Obama \\
+2009 & UK & Brown \\
+\hline
+\end{tabular}
+\end{multicols}
+\pause
+\begin{itemize}
+\item \{\} arguments after {\tt $\backslash$begin\{tabular\}} specify number of columns and alignment
+\pause
+\begin{itemize}
+\item use $\mid$ for vertical dividers.
+\end{itemize}
+\pause
+\item \& is used to specify column breaks
+\pause
+\item use {\tt $\backslash$hline} for horizontal lines  
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+Enclose the table in a {\tt table} environment for captions and placement options ({\tt [!htp]}).
+\pause
+\begin{multicols}{2}
+\red
+\begin{verbatim}
+\begin{table}[!htp]
+\caption{table caption} 
+\begin{tabular}{l|c|r}
+year & country & leader \\
+\hline
+2009 & US & Obama \\
+2009 & UK & Brown \\
+\hline
+\end{tabular}
+\end{table}
+\end{verbatim} 
+\black 
+\newpage
+\pause
+\begin{table}[!htp]
+\caption{table caption} 
+\begin{tabular}{l|c|r}
+year & country & leader \\
+\hline
+2009 & US & Obama \\
+2009 & UK & Brown \\
+\hline
+\end{tabular}
+\end{table}
+\end{multicols}
+\pause
+Try creating your own tables!
+\end{frame}
+
+\section{Graphics}
+\begin{frame}[fragile]
+\frametitle{graphics}
+Include graphics (plots, pictures, etc.) with the {\tt graphicx} package and {\tt $\backslash$includegraphics}.
+\pause
+\red
+\begin{verbatim}
+\includegraphics[<options>]{myfilename.jpg}
+\end{verbatim}
+\black 
+\pause
+\begin{itemize}
+\item adjust the size in options (i.e. {\tt [scale = .5]} or {\tt [width = 2in, height=2in]})
+\pause
+\item for compiling with PDFLaTeX, file must be .jpg, .pdf, or .png
+\pause
+\item for compiling with LaTeX, file must be .ps or .eps
+\pause
+\item embed graphic in a {\tt figure} environment for captions and placement (similar to {\tt table})
+\end{itemize}
+\end{frame}
+
+\section{Floats}
+\begin{frame}[fragile]
+\frametitle{floats}
+The {\tt table} and {\tt figure} environments are known as \textit{floats}, which are objects that cannot be broken up into multiple pages. \\
+\bigskip
+\pause
+
+Floats have three qualities that you should know:
+\pause
+\begin{itemize}
+\item placement
+\item caption
+\item labels and cross-referencing
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]
+placement: 
+\pause
+\begin{itemize}
+\item h: here
+\item t: top of page
+\item b: bottom of page
+\item p: special page for floats
+\item !: override \LaTeX\hspace{1pt} defaults
+\end{itemize}
+\pause
+\bigskip
+\LaTeX\hspace{1pt} will try to accomodate in order.
+\pause
+\red
+\begin{verbatim}
+\begin{figure}[!htp]
+\includegraphics{myfilename.jpg}
+\end{figure}
+\end{verbatim}
+\black 
+
+\end{frame}
+
+\begin{frame}[fragile]
+caption: 
+\pause
+\begin{itemize}
+\item use the {\tt caption} command
+\pause
+\item can be placed below or above
+\end{itemize}
+\pause
+\red
+\begin{verbatim}
+\begin{figure}[!htp]
+\includegraphics{myfilename.jpg}
+\caption{my caption here}
+\end{figure}
+\end{verbatim}
+\black 
+\end{frame}
+
+\begin{frame}[fragile]
+labels and cross-referencing:
+\pause
+\begin{itemize}
+\item \LaTeX\hspace{1pt} will keep an internal numbering of the floats (separate counts for tables and figures)
+\pause
+\item if you have captions, \LaTeX\hspace{1pt} will number your floats for you (i.e. Figure 1: my caption)
+\pause
+\item use the {\tt $\backslash$label} and {\tt $\backslash$ref} commands to refer to the float number in your text
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\red
+\begin{verbatim}
+\begin{figure}[!htp]
+\includegraphics{myfilename.jpg}
+\caption{my caption here}
+\label{<key>}
+\end{figure}
+
+In Figure \ref{<key>}, we can see that...
+\end{verbatim}
+\black 
+\pause
+\begin{itemize}
+\item {\tt $\backslash$label} must be below {\tt $\backslash$caption}
+\pause
+\item if figure is Figure 1, then text will show "In Figure 1, we can see that..."
+\pause
+\item {\tt <key>} is any word, phrase, alphanumeric indicator you want
+\pause
+\item may have to compile more than once to get the references to show up correctly
+\end{itemize}
+\end{frame}
+
+\section{Verbatim}
+\begin{frame}[fragile]
+\frametitle{verbatim}
+One particular environment useful for pasting R code is the {\tt verbatim} environment.
+\pause
+\red
+\begin{verbatim}
+
+\begin{verbatim}
+LaTeX will copy everything in the verbatim 
+environment exactly, rather than interpret it as code.  
+For example, \begin{itemize} 
+here is typed out exactly rather than beginning a list.
+\end{ verbatim}
+
+\end{verbatim}
+\black 
+\end{frame}
+
+\section{Fonts}
+\begin{frame}
+\frametitle{fonts}
+\pause
+\begin{itemize}
+\item define the font size for the document in as an option in {\tt $\backslash$documentclass}: \pause \red {\tt $\backslash$documentclass[12pt]\{article\}} \black 
+\pause
+\item change font size in text using \tiny {\tt $\backslash$tiny}, \scriptsize{\tt $\backslash$scriptsize}, \footnotesize{\tt $\backslash$footnotesize}, \small{\tt $\backslash$small}, \normalsize{\tt $\backslash$normalsize}, \large{\tt $\backslash$large},
+\Large{\tt $\backslash$Large}, \LARGE{\tt $\backslash$LARGE}, \huge{\tt $\backslash$huge}, \Huge{\tt $\backslash$Huge} \normalsize
+\pause
+\item \textcolor{purple}{colored fonts} using {\tt color} package
+\pause
+\item fonts in math mode are different
+\end{itemize}
+\end{frame}
+
+
+\section{Footnotes}
+\begin{frame}[fragile]
+\frametitle{footnotes}
+use the {\tt $\backslash$footnote} command\footnote{like this}
+\pause
+\red
+\begin{verbatim}
+use the {\tt $\backslash$footnote} 
+command\footnote{like this}
+\end{verbatim}
+\black 
+\end{frame}
+
+
+\section{Bibliography}
+\begin{frame}
+\frametitle{bibliography}
+Compiling a bibliography is simple in \LaTeX\hspace{1pt}.
+\pause
+\begin{itemize}
+\item need to use the {\tt natbib} package
+\pause
+\item need a separate file with .bib extension in the same directory 
+\pause
+\item in your .tex file, need the line \red {\tt $\backslash$bibliography\{<name of bib file w/o .bib extension>\}} \black 
+\pause
+\item also in your .tex file, need the line \red {\tt $\backslash$bibliographystyle\{<name of a style>\}} \black 
+\pause
+\begin{itemize}
+\item styles may be downloaded, including an apsr style
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+in .bib file, for each reference, need something like 
+\red
+\begin{verbatim}
+@Article{<key>,
+author = {},
+title = {},
+journal = {},
+year = {},
+}
+\end{verbatim}
+\black 
+\pause
+\begin{itemize}
+\item {\tt <key>} is a unique identifier for each reference that you will refer to in your .tex file
+\pause
+\item your editor should have these fields preset somewhere
+\end{itemize}
+\pause
+\bigskip
+in .tex file, use {\tt $\backslash$citep\{<key>\}}, {\tt $\backslash$citet\{<key>\}}, or {\tt $\backslash$citen\{<key>\}} where you want to reference a certain work
+\end{frame}
+
+\begin{frame}
+when compiling
+\pause
+\begin{enumerate}
+\item LaTeX or PDFLatex once
+\pause
+\item BibTeX once (should be a button or compiling command)
+\pause
+\item LaTeX or PDFLatex once
+\pause
+\item LaTeX or PDFLatex once more
+\end{enumerate}
+\end{frame}
+
+\section{Presentations}
+\begin{frame}
+\frametitle{presentations}
+Powerpoint-like presentations can be done using a document class called {\tt beamer} (may need to be downloaded).
+\pause
+\begin{itemize}
+\item can choose a color theme (default theme used here)
+\pause
+\item same basic code
+\pause
+\item each slide is a {\tt frame} environment
+\pause
+\item use {\tt $\backslash$pause} between clicks
+\end{itemize}
+\end{frame}
+
+\section{The End}
+\begin{frame}
+\begin{center}
+\textbf{anything} can be done using \LaTeX\hspace{1pt} with the right package
+\end{center}
+\end{frame}
+
+\begin{frame}
+\begin{center}
+you will learn much much much more along the way
+\end{center}
+\end{frame}
+
+\begin{frame}
+\begin{center}
+google is your friend
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{exercises}
+Include the following into one .pdf document:
+\begin{itemize}
+\item the following equations:
+\begin{eqnarray*}
+p(\theta | \bm{y}) &\propto& p(\bm{y} | \theta) p(\theta)\\
+&=& \exp \left[ -\frac{1}{2 \sigma^2
+\tau_0^2} \left(\theta^2\left(\sigma^2 +
+\tau_0^2 n \right) - 2 \theta \left( \mu_0
+\sigma^2 + \tau_0^2 n \bar{y} \right)  \right) \right] \\
+\end{eqnarray*}
+\item a $5 \times 3$ table of 5 Harvard political scientists (or other academics) with their names, field or subfield, and office room number
+\item a picture of your favorite celebrity with an appropriate caption
+\item a list of your 3 favorite things about Harvard so far
+\end{itemize}
+\end{frame}
+\end{document}

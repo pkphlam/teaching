@@ -1,0 +1,581 @@
+\documentclass[handout]{beamer}
+
+
+\usetheme{default}
+\usepackage{subfigure}
+\usepackage{amsmath}
+\usepackage{Sweave}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{multicol}
+\usepackage[all]{xy}
+\usepackage{bm}
+\SweaveOpts{eps=F}
+
+\author{Patrick Lam}
+\title{Multilevel Models}
+\date{}
+%\date{December 1, 2008}
+
+\begin{document}
+
+\newcommand{\red}{\textcolor{red}}
+\newcommand{\blue}{\textcolor{blue}}
+\newcommand{\purple}{\textcolor{purple}}
+
+\frame{\titlepage}
+
+\begin{frame}
+\frametitle{Outline}
+\tableofcontents
+\end{frame}
+
+\section{Introduction}
+
+\begin{frame}
+\frametitle{Outline}
+\tableofcontents[currentsection]
+\end{frame}
+
+\begin{frame}
+\frametitle{Multilevel Data}
+\pause
+Suppose we have multilevel data (perhaps cross-country survey data) in
+which we have
+\pause
+\begin{itemize}
+\item $n$ individuals indexed by $i$
+\pause
+\item $J$ groups indexed by $j$ where each individual $i$ belongs to
+one group $j$
+\end{itemize}
+\pause
+\bigskip
+We may have more than two levels (individuals
+within countries within regions) \pause or non-nested levels
+(individuals within certain age groups but also within certain levels
+of education).\\
+\pause
+\bigskip
+Levels can be interpreted in different ways \pause (in TSCS data, we have
+countries over time where each observation is an individual and observations are grouped by country or time).\\
+\pause
+\bigskip
+We may also have both individual and group-level covariates.
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Running Example}
+\pause
+As a running example, we will use a dataset on levels of
+radon in houses in different counties.
+\pause
+\tiny
+\medskip
+<<>>=
+radon <- read.csv("radon.csv")
+@
+\normalsize 
+\pause
+\begin{itemize}
+\item Dependent variable ({\tt log.radon}): the log of the measured
+radon level in a house
+\pause
+\item Independent variable ({\tt floor}): dummy variable for whether
+the measurement was taken on the first floor (1) or the basement (0)
+\pause
+\item The houses are grouped by {\tt county} (85 counties total).
+\pause
+\item Group-level covariate ({\tt u.full}): a measurement of soil
+uranium at the county level
+\end{itemize}
+\pause
+\bigskip
+So our units are houses and the houses are grouped by county.
+\end{frame}
+
+
+\begin{frame}
+How do we deal with the multilevel nature of the data?
+\pause
+\bigskip
+\begin{enumerate}
+\item We can assume the multilevel nature of the data is irrelevant
+by pooling all the observations together as if the groupings did not
+exist (complete pooling model).
+\pause
+\medskip
+\item We can assume the multilevel nature of the data gives us
+information by allowing the coefficients to be completely different for
+each group and estimating them individually for each group (no pooling model).
+\pause
+\medskip
+\item We can allow the coefficients for each group to be different but
+drawn from a common distribution (multilevel model).
+\end{enumerate}
+\pause
+\bigskip
+Options 2 and 3 allow us to model unobserved heterogeneity not
+captured by our covariates \pause (for example, there may be something
+special about group A that is not captured by our covariates)
+\end{frame}
+
+\section{The Complete Pooling Model}
+
+\begin{frame}
+\frametitle{Outline}
+\tableofcontents[currentsection]
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{The Complete Pooling Model}
+Suppose we have the following linear model:
+\pause
+\begin{eqnarray*}
+y_i = \alpha + \beta x_i + \epsilon_i
+\end{eqnarray*}
+\pause
+The \textbf{complete pooling model} assumes that the groupings provide
+no information by constraining the coefficients to be the same for all
+groups \pause (we basically pool all the observations together into a single group).\\
+\bigskip
+\pause
+This is just the normal regression model where $\alpha$ and $\beta$ do
+not vary by $j$.\\
+\medskip
+\pause 
+\tiny
+<<>>=
+complete.pool <- lm(log.radon~floor, data=radon)
+@ 
+\normalsize
+\bigskip
+\pause
+The complete pooling approach may be too restrictive in that it
+ignores any variation in the coefficients between groups \pause (for
+example, $\beta$ might vary over time or across countries.)
+\end{frame}
+
+\section{The No Pooling (fixed effects) Model}
+
+\begin{frame}
+\frametitle{Outline}
+\tableofcontents[currentsection]
+\end{frame}
+
+
+\begin{frame}
+\frametitle{The No Pooling Model}
+In the \textbf{no pooling model}, one or more of the coefficients are
+allowed to vary by group.  \\
+\pause
+\bigskip
+For example, we can let the intercept differ by group:
+\begin{eqnarray*}
+y_i = \alpha_{j[i]} + \beta x_i + \epsilon_i
+\end{eqnarray*} 
+where the notation $\alpha_{j[i]}$ denotes the $\alpha$ corresponding
+to the group $j$ that individual $i$ belongs to.\\
+\pause
+\bigskip
+This model is commonly known as the \textbf{fixed effects model}.\\
+\end{frame}
+
+\begin{frame}
+The varying intercepts attempt to model unobserved heterogeneity
+between groups.\\
+\pause
+\bigskip
+For example, in political science papers, you usually see models that
+use things like ``country fixed effects''.\\
+\pause
+\bigskip
+The assumption is that there might be something different about being
+in a specific country that cannot be captured by the covariates.\\
+\pause
+\bigskip
+Therefore, each country is giving its own intercept (fixed effect) to
+allow for a different baseline level of $y$ (when all covariates equal
+0).\\
+\pause
+\bigskip
+The ``fixed effects'' terminology can be very confusing since it can
+also refer to slightly different quantities (as we will see later).
+\end{frame}
+
+
+\begin{frame}
+We can also let the intercept and slope(s) differ by group:
+\begin{eqnarray*}
+y_i = \alpha_{j[i]} + \beta_{j[i]} x_i + \epsilon_i
+\end{eqnarray*} 
+\pause
+This model is less common.\\
+\bigskip
+\pause
+It assumes that the relationship between $x$ and $y$ is different for
+each group.\\
+\bigskip
+\pause
+One should almost never have a varying slope without a varying
+intercept unless there is a good theoretical reason to do so.
+\end{frame}
+
+\begin{frame}
+\frametitle{Dummy Variables Regression}
+A common way to estimate the fixed effects model is to
+include $J-1$ dummy indicators for the $J$ groups into the regression model (with one group left out as the baseline category)\\ 
+\pause
+\bigskip
+This is sometimes called \textit{dummy variables} regression.\\
+\pause
+\bigskip
+Suppose our individuals belong to one of three groups.  \pause  Let
+$g_j$ be a dummy variable that takes on a value of 1 if $i$ is in
+group $j$ and 0 if not.
+\end{frame}
+
+\begin{frame}[fragile]
+The varying intercept (fixed effects) model is
+\begin{eqnarray*}
+y_i = \alpha + \beta_1 x_i + \beta_2 g_2 + \beta_3 g_3 + \epsilon_i
+\end{eqnarray*}
+\pause
+where 
+\begin{eqnarray*}
+\alpha_1 &=& \alpha \\
+\pause
+\alpha_2 &=& \alpha + \beta_2\\
+\pause
+\alpha_3 &=& \alpha + \beta_3\\ 
+\end{eqnarray*}
+\pause
+$\beta_2$ and $\beta_3$ can be interpreted as the effect on $y$ of being in
+group 2 and group 3 relative to group 1 (the baseline category).\\
+\pause
+\bigskip
+In our example, we can add ``county fixed effects'' by including
+county dummies in the regression.
+\tiny
+\medskip
+\pause
+<<>>= 
+no.pool <- lm(log.radon~floor + as.factor(county), data=radon)
+@ 
+\normalsize
+\end{frame}
+
+\begin{frame}
+Dummy variables regression works well for the fixed effects model if
+the number of groups is relatively small.\\
+\pause
+\bigskip
+However, if we have a large number of groups, 
+
+
+\end{frame}
+
+\subsection{The Hierarchical (random effects) Model}
+
+\begin{frame}
+\frametitle{Outline}
+\tableofcontents[currentsubsection]
+\end{frame}
+
+\begin{frame}
+\frametitle{The Hierarchical Model}
+\pause
+The \textbf{hierarchical model} is a compromise between the complete pooling
+and no pooling models in that it partially pools the coefficients by
+allowing them to differ according to a common distribution (usually
+the normal distribution). \\
+\bigskip
+\pause
+Hierarchical models are also known as partially pooled models, \pause
+multi-level models, \pause mixed effects models, \pause random effects
+models, or \pause random coefficient models.
+\end{frame}
+
+\begin{frame}
+The varying intercept model can be written as 
+\begin{eqnarray*}
+y_i &=& \alpha_{j[i]} + \beta x_i + \epsilon_i \\
+\alpha_j &\sim& N(\alpha, \sigma^2_{\alpha})
+\end{eqnarray*}
+\pause
+or equivalently as
+\begin{eqnarray*}
+y_i &=& \alpha_{j[i]} + \beta x_i + \epsilon_i \\
+\alpha_j &=& \alpha + \eta_j \\
+\eta_j &\sim& N(0, \sigma^2_{\alpha})\\
+\end{eqnarray*}
+\pause
+The estimate of the variance term $\sigma^2_{\alpha}$ gives us a
+measure of how different the coefficients are between groups.
+\pause
+\begin{itemize}
+\item The complete pooling model assumes $\sigma^2_{\alpha} = 0$ 
+\pause
+\item The no pooling model assumes $\sigma^2_{\alpha} = \infty$ 
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+We can also incorporate group-level covariates into the model. \\
+\pause
+\bigskip
+Suppose we think that some group-level covariate $u$ has an effect on
+the average $y$ within groups.  \pause We can think of $u$ as
+affecting the intercepts $\alpha_j$.
+\pause
+\begin{eqnarray*}
+y_i &=& \alpha_{j[i]} + \beta x_i + \epsilon_i \\
+\alpha_j &\sim& N(\gamma_0 + \gamma_1 u_j, \sigma^2_{\alpha})
+\end{eqnarray*}
+\pause
+or equivalently 
+\begin{eqnarray*}
+y_i &=& \alpha_{j[i]} + \beta x_i + \epsilon_i \\
+\alpha_j &=& \gamma_0 + \gamma_1 u_j + \eta_j \\
+\eta_j &\sim& N(0, \sigma^2_{\alpha})
+\end{eqnarray*}
+\pause
+We can interpret $\gamma_1$ as the effect of $u$ on the average $y$
+within a group when all the individual-level covariates are 0.
+\end{frame}
+
+\begin{frame}
+The varying intercept and slope(s) model can be written as 
+\begin{eqnarray*}
+y_i &=& \alpha_{j[i]} + \beta_{j[i]} x_i + \epsilon_i \\
+\begin{pmatrix}
+\alpha_j\\
+\beta_j\\
+\end{pmatrix} 
+&\sim& N \left( 
+\begin{pmatrix}
+\alpha \\
+\beta
+\end{pmatrix},
+\begin{pmatrix}
+\sigma^2_{\alpha} & \rho \sigma_{\alpha} \sigma_{\beta} \\
+\rho \sigma_{\alpha} \sigma_{\beta} & \sigma^2_{\beta} \\
+\end{pmatrix}
+\right)\\
+\end{eqnarray*}
+\pause
+or with group-level covariates
+\begin{eqnarray*}
+y_i &=& \alpha_{j[i]} + \beta_{j[i]} x_i + \epsilon_i \\
+\begin{pmatrix}
+\alpha_j\\
+\beta_j\\
+\end{pmatrix} 
+&\sim& N \left( 
+\begin{pmatrix}
+\gamma_0^{\alpha} + \gamma_1^{\alpha} u_j \\
+\gamma_0^{\beta} + \gamma_1^{\beta} u_j
+\end{pmatrix},
+\begin{pmatrix}
+\sigma^2_{\alpha} & \rho \sigma_{\alpha} \sigma_{\beta} \\
+\rho \sigma_{\alpha} \sigma_{\beta} & \sigma^2_{\beta} \\
+\end{pmatrix}
+\right)\\
+\end{eqnarray*}
+\pause
+We can interpret $\gamma_1^{\beta}$ as the effect of $u$ on the
+relationship between $x$ and $y$ within a group.
+\end{frame}
+
+\begin{frame}
+Hierarchical models are often referred to as \textbf{random effects
+models} because of the randomness of the distribution of coefficients.\\
+\bigskip
+\pause
+However, they are also commonly called \textbf{mixed effects} models
+because they consist of two types of effects:
+\pause
+\begin{itemize}
+\item \textit{fixed effects}, which do not vary across groups
+\pause
+\item \textit{random effects}, which do vary across groups
+\end{itemize}
+\pause
+\bigskip
+The terminology is confusing because the fixed effects referred to
+here are NOT the same as the fixed effects in the no pooling model,
+which refer to the varying intercepts.
+\end{frame}
+
+\begin{frame}
+In the simple varying intercepts hierarchical model, we can identify
+the \blue{fixed effects} and \red{random effects} components.
+\pause
+\begin{eqnarray*}
+y_i &=& \red{\alpha_{j[i]}} + \blue{\beta} x_i + \epsilon_i \\
+%\red{\alpha_j} &\sim& N(\blue{\gamma_0} + \blue{\gamma_1} u_j, \sigma^2_{\alph%a})
+\red{\alpha_j} &=& \blue{\gamma_0} + \blue{\gamma_1} u_j + \red{\eta_j}
+\end{eqnarray*}
+\pause
+By contrast, in the no pooling model, the ``fixed effects'' referred
+to $\alpha_j$, which was allowed to vary.\\
+\bigskip
+\pause
+The confusion in terminology have led some (Gelman, among others) to
+call for the end to the use of the terms ``fixed effects'' and ``random
+effects''.\\
+\bigskip
+\pause
+Nevertheless, people still use them.\\
+\bigskip
+\pause
+In substantive papers, the mention of ``fixed effects'' almost always refers to the no
+pooling model with intercepts varying by group.
+\end{frame}
+
+\subsection{Fixed Effects versus Random Effects}
+
+\begin{frame}
+\frametitle{Outline}
+\tableofcontents[currentsubsection]
+\end{frame}
+
+\begin{frame}
+\frametitle{Fixed Effects versus Random Effects}
+\pause
+Unless there is a theoretical expectation that a complete pooling
+model is appropriate (when there is nothing important about the
+groupings), one should always take advantage of the information in the
+hierarchical nature of the data.\\
+\pause
+\bigskip
+However, which model is better for dealing with hierarchical data: the
+fixed effects (no pooling) model or the random effects
+(partial pooling/hierarchical/mixed effects) model?
+\end{frame}
+
+\begin{frame}
+Many people have suggested reasons for using one over the other, such as
+\pause
+\begin{itemize}
+\item use fixed effects if the group-level coefficients are of
+interest, and use random effects if the interest lies in the
+underlying population
+\pause
+\item use fixed effects when the groups in the data represent all
+possible groups, and use random effects when the population includes
+groups not in the data
+\pause
+\item use fixed effects when the number of groups is small
+(less than five) since there may not be enough to accurately estimate
+the variation in the coefficients
+\end{itemize}
+\bigskip
+\pause
+Gelman suggests always using the random effects model because it is
+less restrictive (the variance of the coefficients is estimated rather
+than assumed to be infinite).
+\end{frame}
+
+\section{Classical Approach to Hierarchical Models in R}
+
+\begin{frame}
+\frametitle{Outline}
+\tableofcontents[currentsection]
+\end{frame}
+
+
+
+
+\subsection{The Complete Pooling Model}
+
+\begin{frame}
+\frametitle{Outline}
+\tableofcontents[currentsubsection]
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{The Complete Pooling Model}
+\pause
+The complete pooling model is the simple linear regression model, which
+ignores the groupings:
+\pause
+\begin{eqnarray*}
+y_i = \alpha + \beta \cdot floor + \epsilon_i
+\end{eqnarray*}
+\tiny
+\pause
+<<>>=
+complete.pool <- lm(log.radon~floor, data=radon); complete.pool
+@ 
+\normalsize
+\end{frame}
+
+\subsection{The No Pooling (fixed effects) Model}
+
+\begin{frame}
+\frametitle{Outline}
+\tableofcontents[currentsubsection]
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{The No Pooling Model}
+\pause
+The no pooling (fixed effects) model adds dummy indicator variables
+for the groupings (``county fixed effects'').
+
+\bigskip
+\pause
+We have 86 coefficients corresponding to the intercept (baseline
+county), slope, and $m-1$ (84) county dummies.
+\tiny
+\medskip
+\pause
+<<>>=
+length(coef(no.pool))
+@ 
+\normalsize
+\pause
+\bigskip
+Alternatively, we could have estimated this without an intercept term
+but with $m$ county dummies.
+\tiny
+\medskip
+\pause
+<<>>= 
+no.pool.1 <- lm(log.radon~floor-1 + as.factor(county), data=radon)
+length(coef(no.pool.1))
+@ 
+\normalsize
+\end{frame}
+
+\subsection{The Hierarchical (random effects) Model}
+
+\begin{frame}
+\frametitle{Outline}
+\tableofcontents[currentsubsection]
+\end{frame}
+
+\begin{frame}
+\frametitle{The Hierarchical Model}
+\pause
+Remember that in our hierarchical/mixed effects model, we had two
+components: \blue{fixed effects} and \red{random effects}.\\
+\bigskip
+\pause
+Our varying intercept model is
+\begin{eqnarray*}
+y_i &=& \red{\alpha_{j[i]}} + \blue{\beta} x_i + \epsilon_i \\
+\red{\alpha_j} &=& \blue{\gamma_0} + \blue{\gamma_1} u_j + \red{\eta_j}
+\end{eqnarray*}
+\pause
+We can substitute the second equation into the first to get
+\begin{eqnarray*}
+y_i &=& (\blue{\gamma_0} + \red{\eta_{j[i]}}) + \blue{\beta} x_i  +
+\blue{\gamma_1} u_{j[i]} + \epsilon_i
+\end{eqnarray*}
+\end{frame}
+
+\end{document}

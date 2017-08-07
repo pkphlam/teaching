@@ -1,0 +1,72 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[latin1]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{fullpage}
+\usepackage{bm}
+\usepackage{color}
+
+\author{Patrick Lam}
+
+\parindent=0in
+\newcommand{\red}{\color{red}}
+\newcommand{\black}{\color{black}}
+\begin{document}
+
+\begin{center}
+\begin{Large}Week 6 Problems\end{Large}
+\end{center}
+\bigskip
+\begin{enumerate}
+
+\item Load the {\tt macro} dataset from the {\tt Zelig} library.  Implement a Bayesian linear regression of {\tt unem} on {\tt gdp} and {\tt trade} using a Gibbs sampler with the following priors:
+
+\begin{eqnarray*}
+\bm{\beta} &\sim& N(\bf{m}, \bf{V}) \\
+\sigma^2 &\sim& \text{Inv-Gamma}\left(\frac{\nu}{2}, \frac{\delta}{2}\right)
+\end{eqnarray*}
+
+Assume $\bm{\beta}$ and $\sigma^2$ are a priori independent. Use diffuse priors (let $\nu=1$ and $\delta=1$).\\
+
+The full conditionals for the Gibbs sampler are:
+
+\begin{eqnarray*}
+\bm{\beta} | \sigma^2, \bf{y} &\sim& N(\bf{m^*}, \bf{V^*}) \\
+\sigma^2 | \bm{\beta}, \bf{y} &\sim& \text{Inv-Gamma}\left(\frac{n+\nu}{2}, \frac{(\bf{y} - \bm{X\beta})' (\bf{y} - \bm{X\beta}) + \delta}{2} \right)
+\end{eqnarray*}
+
+where
+\begin{eqnarray*}
+\bf{V^*} &=& (\bf{X}' (\sigma^2 \bm{I})^{-1} \bf{X} + \bm{V}^{-1})^{-1} \\
+\bf{m^*} &=& \bf{V^*} (\bm{X}' (\sigma^2 \bm{I})^{-1} \bf{y} + \bm{V}^{-1} \bf{m})
+\end{eqnarray*}
+
+Check for convergence both visually and statistically.  
+
+\bigskip 
+
+\item Recall that a probit regression model can be expressed with a latent variable formulation in the following way:
+
+\begin{eqnarray*}
+y_i &=& \left \lbrace \begin{matrix} 1 & \text{if} \; y_i^* \ge 0\\
+0 & \text{if} \; y_i^* < 0 \\ \end{matrix} \right. \\\\
+y_i^* &\sim& N(\mathbf{X}_i \bm{\beta}, 1)
+\end{eqnarray*}
+
+Suppose that $\bf{y}^*$ is a random variable that we want to draw along with $\bm{\beta}$ ($\bf{y}^*$ is unknown and all unknowns are random variables in the Bayesian setting).  Use this formulation and a Gibbs sampler to implement a probit regression model of {\tt vote} on {\tt age} and {\tt income} in the {\tt turnout} dataset in {\tt Zelig}.  That is, you want to sample from
+
+\begin{eqnarray*}
+\bf{y^*} &|& \bm{\beta}, \bf{y} \\
+\bm{\beta} &|& \bf{y^*}, \bf{y}
+\end{eqnarray*}
+
+You may want to use the truncated normal functions {\tt rtnorm()} in the {\tt msm} package.  Be sure to check for convergence.
+\end{enumerate}
+
+\end{document}
+
+
+
+
+

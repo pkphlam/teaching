@@ -1,0 +1,276 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[latin1]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{fullpage}
+\usepackage{color}
+\author{Patrick Lam}
+
+\parindent=0in
+\newcommand{\red}{\color{red}}
+\newcommand{\black}{\color{black}}
+\begin{document}
+
+\begin{center}
+\begin{Large}Week 1 Problems\end{Large}
+\end{center}
+\bigskip
+\begin{enumerate}
+
+\item An urn contains 10 red balls and 15 white balls. You pick two balls at random without replacement. 
+
+\medskip
+\red
+Let $E$ be the event that the first ball is red and let $F$ be the
+event that the second ball is red.
+\black 
+
+\begin{enumerate}
+\item[a)] What is the probability that the first ball is red?
+
+\medskip \red
+$P(E) = \frac{10}{25} = \mathbf{\frac{2}{5}}$
+\medskip \black 
+
+\item[b)] What is the probability that the second ball is red?
+
+\medskip \red
+$P(F) = P(F|E) P(E) + P(F|\bar{E}) P(\bar{E}) = \left( \frac{9}{24}
+\right) \left( \frac{10}{25} \right) + \left( \frac{10}{24} \right)
+\left( \frac{15}{25} \right) = \frac{240}{600} = \mathbf{\frac{2}{5}}$
+\medskip \black 
+
+\item[c)] What is the probability that both balls are white?
+
+\medskip \red
+$P(\bar{E} \cap \bar{F}) = P(\bar{F} | \bar{E}) P(\bar{E}) = \left(
+\frac{14}{24} \right) \left( \frac{15}{25} \right) = \frac{210}{600} =
+\mathbf{\frac{7}{20}}$
+\medskip \black 
+
+\item[d)] What is the probability that the second ball is red given that the first ball is white?
+
+\medskip \red
+$P(F|\bar{E}) = \frac{10}{24} = \mathbf{\frac{5}{12}}$
+\medskip \black 
+
+\item[e)] What is the probability that the first ball is red given that the second ball is white?
+
+\medskip \red
+$P(E|\bar{F}) = \dfrac{P(E \cap \bar{F})}{P(\bar{F})} =
+\dfrac{P(\bar{F}|E)P(E)}{P(\bar{F})} = \dfrac{\left( \frac{15}{24}
+\right) \left( \frac{2}{5} \right)}{1 - \frac{2}{5}} = \dfrac{\left(
+\frac{15}{24} \right) \left( \frac{2}{5} \right)}{\frac{3}{5}} =
+\dfrac{\frac{30}{120}}{\frac{3}{5}} = \mathbf{\frac{5}{12}}$
+\medskip \black 
+
+\end{enumerate}
+
+\bigskip
+
+\item (From Gelman 3.7) A student sits on a street corner for an hour and records the number of bicycles $b$ and the number of other vehicles $v$ that go by.  Two models are considered:
+\begin{itemize}
+\item The outcomes $b$ and $v$ have independent Poisson distributions, with unknown means $\theta_b$ and $\theta_v$.
+\item The outcome $b$ has a binomial distribution, with unknown probability $p$ and sample size $b + v$.
+\end{itemize}
+Show that the two models have the same likelihood if we define $p = \frac{\theta_b}{\theta_b + \theta_v}$. \\
+
+Hints:
+\begin{itemize}
+\item Find the conditional distribution of $b$ conditioning on information you know.
+\item If $X \sim \mathrm{Poisson}(\theta_1)$ and $Y \sim \mathrm{Poisson}(\theta_2)$, then $X+Y \sim \mathrm{Poisson}(\theta_1 + \theta_2)$.
+\end{itemize}
+
+\medskip \red
+We are given that the total number of bicycles and vehicles is $b+v$.
+We are also told that the likelihood of $b$ is a binomial
+distribution.  So we can show that the likelihood of $b$ is a binomial
+by starting from the two Poisson distributions and conditioning on the
+total number of vehicles $b+v$. Thus, the likelihood we are trying to
+find is $p(b | b+v)$.  We need to use Bayes' Rule for conditional
+probability distributions.
+\begin{eqnarray*}
+p(b | b + v) &=& \frac{p(b + v | b) p(b)}{p(b+v)}\\
+&=& \frac{p(v) p(b)}{p(b+v)} \\
+&=& \frac{\mathrm{Poisson}(\theta_v) \;
+\mathrm{Poisson}(\theta_b)}{\mathrm{Poisson}(\theta_b + \theta_v)}
+\end{eqnarray*}
+The denominator is a Poisson($\theta_b + \theta_v$) distribution
+because the sum of Poisson distributions is also a Poisson distribution.\\
+
+We can then do some math to simplify.
+\begin{eqnarray*}
+p(b|b+v) &=& \frac{\frac{e^{-\theta_v} \theta_v^v}{v!}
+\frac{e^{-\theta_b} \theta_b^b}{b!}}{\frac{e^{-(\theta_b + \theta_v)}
+(\theta_b + \theta_v)^{b+v}}{(b+v)!}}\\
+&=& \frac{(b+v)!}{b! \; v!} \; \frac{\theta_b^b \theta_v^v}{(\theta_b +
+\theta_b)^{b+v}} \\
+&=& \frac{(b+v)!}{b! \; v!} \; \frac{\theta_b^b}{(\theta_b +
+\theta_v)^{b}} \; \frac{\theta_v^v}{(\theta_b + \theta_v)^{v}}\\
+&=& \frac{(b+v)!}{b! \; v!} \; \left( \frac{\theta_b}{\theta_b +
+\theta_v} \right)^b \; \left( \frac{\theta_v}{\theta_b + \theta_v} \right)^v\\
+&=& \frac{(b+v)!}{b! \; v!} \; \left( \frac{\theta_b}{\theta_b +
+\theta_v} \right)^b \; \left( \frac{\theta_v + \theta_b - \theta_b}{\theta_b + \theta_v} \right)^v\\
+&=& \frac{(b+v)!}{b! \; v!} \; \left( \frac{\theta_b}{\theta_b +
+\theta_v} \right)^b \; \left(1 - \frac{\theta_b}{\theta_b + \theta_v} \right)^v\\
+\end{eqnarray*}
+This is a binomial distribution with $b+v$ trials and probability $\frac{\theta_b}{\theta_b + \theta_v}$.
+\black 
+
+
+
+\bigskip 
+
+\item Let $X \sim$ Uniform(1,4). Use calculus to find $E(X)$ and Var($X$). 
+
+\medskip \red
+Let $X$ be distributed uniform over the interval (1,4).  We know the
+formula for the variance of a random variable:
+
+\begin{equation*}
+ \mathrm{Var}(X) = E(X^2) - [E(X)]^2
+\end{equation*}
+
+To find $E(X)$, we simply take the integral of the form
+
+\begin{equation*}
+ \int_1^4 x p(x) \; dx
+\end{equation*}
+
+where $f(x)$ is the PDF of the uniform density.  We can think of this
+as analogous to the discrete case, where we take the sum of each $x$
+value weighted by its probability.  So we end up with
+
+\begin{eqnarray*}
+ E(X) &=& \int_1^4 x p(x) \; dx\\
+&=& \int_1^4 x \frac{1}{4-1} \; dx\\
+&=& \frac{1}{3} \int_1^4 x \; dx\\
+&=& \frac{1}{3} \left. \frac{1}{2} x^2 \right| ^4_1\\ 
+&=& \frac{16}{6} - \frac{1}{6}\\
+&=& \mathbf{\frac{15}{6}} 
+\end{eqnarray*} 
+
+To find $E(X^2)$, we take the following integral
+
+\begin{equation*}
+ \int_1^4 x^2 p(x) \; dx
+\end{equation*}
+
+using what is sometimes known as the \textit{Law of the Unconscious
+Statistician}.  Basically, we can find the expected value of a
+function of $X$ by using the PDF of $X$.  
+
+\begin{eqnarray*}
+ E(X^2) &=& \int_1^4 x^2 p(x) \; dx\\
+&=& \frac{1}{3} \int_1^4 x^2 \; dx\\
+&=& \frac{1}{3} \left. \frac{1}{3} x^3 \right| ^4_1\\ 
+&=& \frac{64}{9} - \frac{1}{9}\\
+&=& \frac{63}{9}\\
+&=& 7 
+\end{eqnarray*} 
+
+The variance is then simply 
+
+\begin{eqnarray*}
+ \mathrm{Var}(X) &=& E(X^2) - [E(X)]^2 \\
+ &=& 7 - \left( \frac{15}{6} \right) ^ 2 \\
+ &=& 7 - \frac{225}{36} \\
+ &=& 7 - \frac{25}{4} \\
+ &=& \mathbf{\frac{3}{4}}
+\end{eqnarray*}
+\black 
+
+\bigskip 
+
+\item 
+\begin{enumerate}
+\item[a)]
+Suppose you have $n$ independent observations $X_i$ from an exponential distribution where 
+\begin{eqnarray*}
+p(x_i | \lambda) = \lambda e^{-\lambda x_i}
+\end{eqnarray*}
+Analytically find the maximum likelihood estimate of $\lambda$.
+
+\medskip \red
+\begin{eqnarray*}
+L(\lambda | X) &=& \prod_{i=1}^n \lambda e^{-\lambda x_i} \\
+l(\lambda | X) &=& \sum_{i=1}^n \log \lambda - \lambda x_i \\
+&=& n \log \lambda - \lambda \sum_{i=1}^n x_i \\
+l'(\lambda | X) &=& \frac{n}{\lambda} - \sum_{i=1}^n x_i
+\end{eqnarray*}
+Setting the derivative to 0 and solving for $\hat{\lambda}$:
+\begin{eqnarray*}
+0 &=& \frac{n}{\lambda} - \sum_{i=1}^n x_i \\
+\hat{\lambda} &=& \frac{n}{\sum_{i=1}^n x_i}
+\end{eqnarray*}
+\black 
+\medskip
+\item[b)] Now reparameterize the distribution for $X_i$ in terms of $\tau$ where 
+\begin{eqnarray*}
+\tau = \frac{1}{\lambda}
+\end{eqnarray*}
+Find the MLE for $\tau$.
+
+\medskip \red
+\begin{eqnarray*}
+L(\tau | X) &=& \prod_{i=1}^n \frac{1}{\tau} e^{-\frac{x_i}{\tau}} \\
+l(\tau | X) &=& \sum_{i=1}^n - \log \tau - \frac{x_i}{\tau} \\
+&=& - n \log \tau - \frac{\sum_{i=1}^n x_i}{\tau} \\
+l'(\tau | X) &=& -\frac{n}{\tau} + \frac{\sum_{i=1}^n x_i}{\tau^2}
+\end{eqnarray*}
+Setting the derivative to 0 and solving for $\hat{\tau}$:
+\begin{eqnarray*}
+0 &=& -\frac{n}{\tau} + \frac{\sum_{i=1}^n x_i}{\tau^2} \\
+\frac{n}{\tau} &=& \frac{\sum_{i=1}^n x_i}{\tau^2} \\
+n &=& \frac{\sum_{i=1}^n x_i}{\tau} \\
+\hat{\tau} &=& \frac{\sum_{i=1}^n x_i}{n}
+\end{eqnarray*}
+\black 
+\end{enumerate}
+
+\bigskip
+
+\item Suppose that $X$ follows a Gamma($\alpha, \beta$) distribution.  Show that $\frac{1}{X}$ follows an Inv-Gamma($\alpha$, $\beta$) distribution.
+
+\begin{itemize}
+\item Gamma PDF: $p(y) = \frac{\beta^{\alpha}}{\Gamma(\alpha)} y^{\alpha-1} e^{-\beta y}$
+\item Inverse Gamma PDF: $p(y) = \frac{\beta^{\alpha}}{\Gamma(\alpha)} y^{-(\alpha+1)} e^{-\beta/y}$
+\item Change of Variables formula: Let $Y = g(X)$ and $X = g^{-1}(Y)$.  Then 
+\begin{eqnarray*}
+p_Y(y) = p_X(g^{-1}(y)) \left \vert \frac{d}{dy} g^{-1}(y) \right \vert
+\end{eqnarray*}
+\end{itemize}
+
+\medskip \red
+
+So let $Y = \frac{1}{X}$ and $X = \frac{1}{Y}$.  If $X$ follows a Gamma distribution, then we need to show that $Y$ follows an Inverse Gamma distribution.
+
+\begin{eqnarray*}
+p_Y(y) &=& p_X(g^{-1}(y)) \left \vert \frac{d}{dy} g^{-1}(y) \right \vert \\
+&=& \frac{\beta^{\alpha}}{\Gamma(\alpha)} g^{-1}(y)^{\alpha-1} e^{-\beta g^{-1}(y)} \left \vert - \frac{1}{y^2}  \right \vert \\
+&=& \frac{\beta^{\alpha}}{\Gamma(\alpha)} \left( \frac{1}{y} \right)^{\alpha-1} e^{\frac{-\beta}{y}} \left( \frac{1}{y^2}  \right) \\ 
+&=& \frac{\beta^{\alpha}}{\Gamma(\alpha)} y^{-(\alpha-1)} e^{\frac{-\beta}{y}} y^{-2}   \\
+&=& \frac{\beta^{\alpha}}{\Gamma(\alpha)} y^{-(\alpha+1)} e^{\frac{-\beta}{y}}  
+\end{eqnarray*}
+
+
+\end{enumerate}
+
+\end{document}
+
+
+
+
+
+\item (From Gelman 2.10) Suppose there are $N$ cable cars in San Francisco, numbered sequentially from 1 to $N$.  You see a cable car at random; it is numbered 203.  You wish to estimate $N$. \\
+
+Assume your prior distribution on $N$ is geometric with mean 100; that is,
+\begin{eqnarray*}
+p(N) = (1/100)(99/100)^{N-1}, \; \mathrm{for} \; N = 1,2,\dots
+\end{eqnarray*}
+What is your posterior distribution for $N$ up to a constant of proportionality?  What are the posterior mean and standard deviation of $N$ (approximate them in R)?  
+
+\bigskip
+
+\item Suppose $Y$ is distributed Poisson($\lambda$) with a Gamma($\alpha, \beta$) prior on $\lambda$.  Derive the posterior for $\lambda$, $p(\lambda | y)$.  What is this distribution?

@@ -1,0 +1,174 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[latin1]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{fullpage}
+\usepackage{bm}
+\parindent=0in
+\begin{document}
+\section*{Discrete Distributions}
+
+\bigskip
+
+\begin{itemize}
+\item Poisson Distribution 
+\begin{eqnarray*}
+\theta &\sim& \mathrm{Poisson}(\lambda); \; \lambda > 0 \\\\
+p(\theta) &=& \frac{\exp(-\lambda) \lambda^{\theta}}{\theta !} \; \mathrm{for} \; \theta=0,1,2,\dots \\\\
+E(\theta) &=& \lambda \\
+\mathrm{Var}(\theta) &=& \lambda
+\end{eqnarray*}
+
+\bigskip
+
+\item Binomial Distribution 
+\begin{eqnarray*}
+\theta &\sim& \mathrm{Binomial}(n,p); \; p \in [0,1] \\\\
+p(\theta) &=& \binom{n}{\theta} p^{\theta} (1-p)^{n-\theta} \; \mathrm{for} \; \theta=0,1,2,\dots,n \\\\
+E(\theta) &=& np \\
+\mathrm{Var}(\theta) &=& np(1-p)
+\end{eqnarray*}
+
+\bigskip
+
+\item Multinomial Distribution 
+\begin{eqnarray*}
+\bm{\theta} &\sim& \mathrm{Multinomial}(n; p_1,\cdots,p_k); \; p_j \in [0,1], \; \sum_{j=1}^k p_j =1 \\\\
+p(\bm{\theta}) &=& \left( \frac{n!}{\theta_1! \cdots \theta_k!} \right) p^{\theta_1}_1 \dots p_k^{\theta_k} \; \mathrm{for} \; \theta_j=0,1,2,\dots,n; \; \sum_{j=1}^k \theta_j = n \\\\
+E(\theta_j) &=& np_j \\
+\mathrm{Var}(\theta_j) &=& np_j(1-p_j)
+\end{eqnarray*}
+
+\end{itemize}
+
+\bigskip
+
+\section*{Continuous Distributions}
+
+\bigskip
+
+\begin{itemize}
+\item Uniform Distribution 
+\begin{eqnarray*}
+\theta &\sim& \mathrm{Uniform}(\alpha,\beta); \; \beta > \alpha \\\\
+p(\theta) &=& \frac{1}{\beta - \alpha} \; \mathrm{for} \; \theta \in [\alpha,\beta] \\\\
+E(\theta) &=& \frac{\alpha + \beta}{2} \\
+\mathrm{Var}(\theta) &=& \frac{(\beta-\alpha)^2}{12}
+\end{eqnarray*}
+
+\bigskip
+
+\item Normal Distribution 
+\begin{eqnarray*}
+\theta &\sim& \mathrm{N}(\mu, \sigma^2); \; \sigma^2 > 0 \\\\
+p(\theta) &=& \frac{1}{\sqrt{2\pi\sigma^2}} \exp \left( -\frac{(\theta-\mu)^2}{2\sigma^2} \right) \\\\
+E(\theta) &=& \mu \\
+\mathrm{Var}(\theta) &=& \sigma^2
+\end{eqnarray*}
+
+\bigskip
+
+\item Multivariate Normal Distribution 
+\begin{eqnarray*}
+\bm{\theta} &\sim& \mathrm{N}_d(\bm{\mu}, \bm{\Sigma}) \\\\
+p(\bm{\theta}) &=& (2\pi)^{-d/2} \vert  \bm{\Sigma} \vert^{-1/2} \exp \left( -\frac{1}{2} (\bm{\theta} - \bm{\mu})^T \bm{\Sigma}^{-1} (\bm{\theta} - \bm{\mu}) \right)\\\\
+E(\bm{\theta}) &=& \bm{\mu} \\
+\mathrm{Var}(\bm{\theta}) &=& \bm{\Sigma}
+\end{eqnarray*}
+
+\bigskip
+
+\item Gamma Distribution 
+\begin{eqnarray*}
+\theta &\sim& \mathrm{Gamma}(\alpha, \beta); \; \alpha, \beta > 0 \\\\
+p(\theta) &=& \frac{\beta^{\alpha}}{\Gamma(\alpha)} \theta^{\alpha-1} e^{-\beta \theta}; \; \theta > 0\\\\
+E(\theta) &=& \frac{\alpha}{\beta} \\
+\mathrm{Var}(\theta) &=& \frac{\alpha}{\beta^2}
+\end{eqnarray*}
+
+\bigskip
+
+\item Inverse-gamma Distribution 
+\begin{eqnarray*}
+\theta &\sim& \text{Inv-Gamma}(\alpha, \beta); \; \alpha, \beta > 0 \\\\
+p(\theta) &=& \frac{\beta^{\alpha}}{\Gamma(\alpha)} \theta^{-(\alpha+1)} e^{-\beta / \theta}; \; \theta > 0\\\\
+E(\theta) &=& \frac{\beta}{\alpha-1} \; \mathrm{for} \; \alpha>1 \\
+\mathrm{Var}(\theta) &=& \frac{\beta^2}{(\alpha-1)^2(\alpha-2)}, \; \alpha > 2
+\end{eqnarray*}
+
+\bigskip
+
+\item Exponential Distribution 
+\begin{eqnarray*}
+\theta &\sim& \mathrm{Exponential}(\lambda); \; \lambda > 0 \\\\
+p(\theta) &=& \lambda e^{-\lambda \theta}; \; \theta > 0\\\\
+E(\theta) &=& \frac{1}{\lambda} \\
+\mathrm{Var}(\theta) &=& \frac{1}{\lambda^2}
+\end{eqnarray*}
+
+\bigskip
+
+\item Beta Distribution 
+\begin{eqnarray*}
+\theta &\sim& \mathrm{Beta}(\alpha, \beta); \; \alpha, \beta > 0 \\\\
+p(\theta) &=& \frac{\Gamma(\alpha+\beta)}{\Gamma(\alpha) \Gamma(\beta)} \theta^{\alpha-1} (1-\theta)^{\beta-1}; \; \theta \in [0,1] \\\\
+E(\theta) &=& \frac{\alpha}{\alpha + \beta} \\
+\mathrm{Var}(\theta) &=& \frac{\alpha \beta}{(\alpha+\beta)^2(\alpha+\beta+1)}
+\end{eqnarray*}
+
+\bigskip
+
+\item Dirichlet Distribution 
+\begin{eqnarray*}
+\bm{\theta} &\sim& \mathrm{Dirichlet}(\alpha_1,\dots,\alpha_k); \; \alpha_j > 0 \\\\
+p(\bm{\theta}) &=& \frac{\Gamma(\alpha_1+\dots+\alpha_k)}{\Gamma(\alpha_1) \cdots \Gamma(\alpha_k)} \theta_1^{\alpha_1-1} \cdots \theta_k^{\alpha_k-1}; \; \theta_1,\dots,\theta_k \ge 0, \; \sum_{j=1}^k \theta_j = 1\\\\
+E(\theta_j) &=& \frac{\alpha_j}{\alpha_0} \; \mathrm{where} \; \alpha_0 \equiv \sum_{j=1}^k \alpha_j \\
+\mathrm{Var_j}(\theta) &=& \frac{\alpha_j (\alpha_0 - \alpha_j)}{\alpha^2_0 (\alpha_0 + 1)} \\
+\mathrm{Cov}(\theta_i, \theta_j) &=& -\frac{\alpha_i \alpha_j}{\alpha_0^2 (\alpha_0+1)}
+\end{eqnarray*}
+
+\end{itemize}
+
+\bigskip
+
+\section*{Formulas}
+
+\bigskip
+
+\begin{itemize}
+\item (Univariate) Change of Variables formula \\
+
+Let $Y = g(X)$ and $X = g^{-1}(Y)$.  Then 
+\begin{eqnarray*}
+p_Y(y) = p_X(g^{-1}(y)) \left \vert \frac{d}{dy} g^{-1}(y) \right \vert
+\end{eqnarray*}
+\end{itemize}
+
+\bigskip
+
+\section*{Conjugacy}
+
+\bigskip
+
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline 
+&& \\
+Likelihood & Prior & Posterior \\
+&&\\
+\hline 
+&& \\
+$Y_i \sim \mathrm{Bernoulli}(\pi)$ & $\pi \sim \mathrm{Beta}(\alpha, \beta)$ & $\mathrm{Beta}(\alpha+\sum_{i=1}^n y_i, \beta + n - \sum_{i=1}^n y_i)$ \\
+&&\\
+$Y_i \sim \mathrm{Binomial}(N,\pi)$ & $\pi \sim \mathrm{Beta}(\alpha, \beta)$ & $\mathrm{Beta}(\alpha+\sum_{i=1}^n y_i, \beta + n N - \sum_{i=1}^n y_i)$ \\
+&&\\
+$Y_i \sim \mathrm{Poisson}(\lambda)$ & $\lambda \sim \mathrm{Gamma}(\alpha, \beta)$ & $\mathrm{Gamma}(\alpha+\sum_{i=1}^n y_i, \beta + n)$ \\
+&&\\
+$Y_i \sim \mathrm{Multinomial}(N, \bm{\pi})$ & $\bm{\pi} \sim \mathrm{Dirichlet}(\alpha_1,\dots,\alpha_k)$ & $\mathrm{Dirichlet}(\alpha_1+\sum_{i=1}^n y_{i1}, \dots, \alpha_k + \sum_{i=1}^n y_{ik})$ \\
+&&\\
+\hline
+\end{tabular}
+\end{center}
+
+\end{document}
